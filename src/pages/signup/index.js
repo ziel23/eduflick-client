@@ -13,7 +13,7 @@ import bcrypt from 'bcryptjs';
 export default function SignUpPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
+    name: '',
     email: '',
     password: '',
     conpassword: ''
@@ -68,7 +68,7 @@ export default function SignUpPage() {
       <Box sx={{width: '100%', paddingTop: 8}}>
         <form onSubmit={handleSignUp}>
           <Card sx={{minWidth: 300, maxWidth: 400, margin: 'auto', marginTop: 2, display: 'flex', flexDirection: 'column', padding: 2, gap: 2}}>
-            <TextField label="Username" variant="outlined" name="username" onChange={handleChange}/>
+            <TextField label="Username" variant="outlined" name="name" onChange={handleChange}/>
             <TextField label="Email" variant="outlined" name="email" onChange={handleChange}/>
             <TextField label="Password" variant="outlined" name="password" type='password' onChange={handleChange}/>
             <TextField label="Confirm Password" variant="outlined" name="conpassword" type='password' onChange={handleChange}/>

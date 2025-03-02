@@ -7,14 +7,37 @@ import SignalCellularAltOutlinedIcon from '@mui/icons-material/SignalCellularAlt
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import logo from "../images/logo.png"
 import IconButton from '@mui/material/IconButton';
-import { useLocation } from 'react-router-dom';
-
+import { useLocation, useNavigate } from 'react-router-dom';
+import Popper from '@mui/material/Popper';
+import { Menu, MenuItem, Paper } from '@mui/material';
 
 export default function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const handleClose = (event) => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popper' : undefined;
 
   const isPrivate = location.pathname != '/' && location.pathname != '/signup';
-  console.log("[location.pathname]", location.pathname, isPrivate);
+
+  const handleLogout = () => {
+    navigate('/')
+    handleClose()
+  }
+
+  const handleProfile = () => {
+    navigate('/profile')
+    handleClose()
+  }
   
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -30,14 +53,23 @@ export default function Header() {
           />     
           <Box sx={{display: isPrivate ? 'block' : 'none'}}>
             <IconButton sx={{color: 'black'}}>
-              <InsertDriveFileOutlinedIcon/>
+              <SignalCellularAltOutlinedIcon onClick={()=>navigate('/leaders-board')} />
             </IconButton>
-            <IconButton sx={{color: 'black'}}>
-              <SignalCellularAltOutlinedIcon/>
-            </IconButton>
-            <IconButton sx={{color: 'black'}}>
+            <IconButton sx={{color: 'black'}} onClick={handleClick} aria-describedby={id}>
               <PersonOutlineOutlinedIcon/>
             </IconButton>
+            <Paper>
+              <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                sx={{width: 250}}
+              >
+                <MenuItem onClick={handleProfile}>Profile</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+            </Paper>
           </Box>
         </Toolbar>
       </AppBar>

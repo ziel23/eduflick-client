@@ -11,10 +11,10 @@ const Layout = (props) => {
   const {children} = props
   React.useEffect(() => {
     document.title = "Eduflick";
-    const token = localStorage.getItem("token")
-    if (token && (location.pathname == '/' || location.pathname == '/signup')) {
-      navigate('/home')
-    }
+    // const token = localStorage.getItem("token")
+    // if (token && (location.pathname == '/' || location.pathname == '/signup')) {
+    //   navigate('/home')
+    // }
   })
   
   return (
