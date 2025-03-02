@@ -21,7 +21,7 @@ const ProfileSettings = () => {
   return (
     <Box sx={{width: '100%', paddingTop: 4 }}>
       <Box sx={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
-        <Typography variant="h4">Leaderboard</Typography>
+        <Typography variant="h4">Profile</Typography>
       </Box>
       <Box sx={{width: '100%', marginTop: 1}}>
         <Divider/>
