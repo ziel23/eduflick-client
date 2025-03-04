@@ -50,6 +50,7 @@ export default function Header() {
             }}
             alt="Your Image Description"
             src={logo}
+            onClick={()=>navigate('/home')}
           />     
           <Box sx={{display: isPrivate ? 'block' : 'none'}}>
             <IconButton sx={{color: 'black'}}>

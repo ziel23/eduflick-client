@@ -35,7 +35,7 @@ const style = {
 export default function CardPage() {
   const navigate = useNavigate();
   const [cardOrientation, setCardOrientation] = useState(0)
-  const [isCardRotate, setIsCardRotate] = useState(0)
+  const [isCardFlipped, setIsCardFlipped] = useState(0)
   const [cardName, setCardName] = useState("")
   const [cards, setCards] = useState([])
   const [open, setOpen] = useState(false);
@@ -76,16 +76,12 @@ export default function CardPage() {
 
   const handleLeft = () => {
     setCardOrientation(cardOrientation - 1)
-    setIsCardRotate(false)
-  }
-  
-  const handleRotate = () => {
-    setIsCardRotate(!isCardRotate)
+    setIsCardFlipped(false)
   }
 
   const handleRight = () => {
     setCardOrientation(cardOrientation + 1)
-    setIsCardRotate(false)
+    setIsCardFlipped(false)
   }
 
   const handleAddQuestion = () => {
@@ -101,8 +97,12 @@ export default function CardPage() {
     setModalForm((prev)=>({...prev, [name]: value}))
   }
 
+  const handleFlipCard = () => {
+    setIsCardFlipped(!isCardFlipped)
+  }
+
   return (
-    <Box sx={{width: '100%', paddingTop: 4 }}>
+    <Box sx={{width: '100%', paddingTop: 8 }}>
       <Modal
         open={open}
         onClose={handleCloseModal}
@@ -183,8 +183,6 @@ export default function CardPage() {
               )
             }
             
-            
-            
           </Box>
 
         </Box>
@@ -206,33 +204,33 @@ export default function CardPage() {
             >
               <Paper
                 sx={{
-                  width: '45%',
+                  width: '50%',
                   aspectRatio: '2 / 3',
                   display: 'flex',
                   justifyContent: 'center',
                   padding: 3,
                   borderRadius: 8,
                   border: '3px solid',
-                  borderColor: isCardRotate && '#FFDE07',
-                  background: isCardRotate && '#3D3369'
+                  borderColor: isCardFlipped && '#FFDE07',
+                  background: isCardFlipped && '#3D3369',
                 }}
                 elevation={3}
               >
-                <Box
+                <Box 
                   sx={{
-                    borderRadius: 5,
-                    width: '100%',
                     border: '3px solid',
-                    display: 'flex',
-                    alignItems: 'center',
+                    width: '100%', 
+                    borderRadius: 5,
+                    display: "flex",
                     justifyContent: 'center',
-                    borderColor: isCardRotate && '#FFDE07',
-                    background: isCardRotate && '#3D3369',
-                    color: isCardRotate && '#fff'
+                    alignItems: 'center',
+                    background: isCardFlipped && '#3D3369',
+                    color: isCardFlipped && 'white',
+                    borderColor: isCardFlipped &&'#FFDE07',
                   }}
                 >
                   {
-                    cardOrientation == 0 && <Typography>
+                    cardOrientation == 0 && <Typography variant='h5' sx={{fontWeight: 600}}>
                       {cardName ? cardName : "Flash Card Name"}
                     </Typography>
                   }
@@ -241,22 +239,21 @@ export default function CardPage() {
                       return (
                         <>
                           {
-                            cardOrientation == idx+1 && <Typography>
-                              {isCardRotate ? card.answer : card.question}
+                            cardOrientation == idx+1 && <Typography variant='h6' sx={{fontWeight: 600}}>
+                              {isCardFlipped ? card.answer : card.question}
                             </Typography>
                           }
                         </>
                       )
                     })
                   }
-
                 </Box>
               </Paper>
               <Box sx={{width: '100%', display: 'flex', justifyContent: 'center'}}>
                 <IconButton aria-label="arrow left" onClick={handleLeft} sx={{visibility: cardOrientation == 0 && 'hidden'}}>
                   <ArrowCircleLeftIcon sx={{fontSize: 44}}/>
                 </IconButton>
-                <IconButton aria-label="arrow left" onClick={handleRotate} sx={{visibility: cardOrientation == 0 && 'hidden'}}>
+                <IconButton aria-label="arrow left" onClick={handleFlipCard} sx={{visibility: cardOrientation == 0 && 'hidden'}}>
                   <FlipIcon sx={{fontSize: 44}}/>
                 </IconButton>
                 <IconButton aria-label="arrow right" onClick={handleRight} sx={{visibility: (cardOrientation > (cards.length - 1)) && 'hidden'}}>
