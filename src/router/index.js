@@ -5,7 +5,7 @@ import LoginPage from '../pages/login';
 import SignUpPage from '../pages/signup';
 import HomePage from '../pages/home';
 import CardPage from '../pages/card';
-import CardViewPage from '../pages/cardview';
+import TestPage from '../pages/test';
 import LeadersBoardPage from '../pages/leadersBoard';
 import LeadersBoardCardPage from '../pages/leadersBoardCards';
 import ProfilePage from '../pages/profile';
@@ -20,7 +20,7 @@ const AppRouter = () => (
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/card" element={<CardPage />} />
-        <Route path="/card/:id" element={<CardViewPage />} />
+        <Route path="/test/:id" element={<TestPage />} />
         <Route path="/leaders-board" element={<LeadersBoardPage />} />
         <Route path="/leaders-board/:id" element={<LeadersBoardCardPage />} />
         <Route path="/profile" element={<ProfilePage />} />

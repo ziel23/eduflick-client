@@ -46,17 +46,17 @@ export default function LeadersBoardPage() {
   return (
     <Box sx={{width: '100%', paddingTop: 8 }}>
       <Box sx={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
-        <Typography variant="h4">Leaderboard</Typography>
+        <Typography variant="h4" color="white">Leaderboard</Typography>
       </Box>
       <Box sx={{width: '100%', marginTop: 1}}>
-        <Divider/>
+        <Divider sx={{borderColor: "white"}}/>
       </Box>
       <Box sx={{flexGrow: 1, paddingTop: 4}}>
         <Grid container spacing={5}>
             {
                 leaderBoards?.map((item) => {
                     return (
-                        <Grid size={3} onClick={()=>handleClick(item.id)}>
+                        <Grid size={{xs: 12, sm: 6, md: 4, lg:3, xl: 3}} onClick={()=>handleClick(item.id)}>
                             <Paper 
                                 elevation={3} 
                                 className={classes.clickablePaper}

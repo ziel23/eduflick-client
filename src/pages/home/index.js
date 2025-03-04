@@ -61,6 +61,14 @@ export default function HomePage() {
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popper' : undefined;
 
+  const handleCopyLink = (linkToCopy) => {
+    navigator.clipboard.writeText(linkToCopy).then(() => {
+      alert('Link copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  };
+
   return (
     <Box sx={{width: '100%', paddingTop: 8 }}>
       <Box sx={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
@@ -74,7 +82,7 @@ export default function HomePage() {
         </Box>
       </Box>
       <Box sx={{width: '100%', marginTop: 1}}>
-        <Divider/>
+        <Divider sx={{borderColor: "white"}}/>
       </Box>
       <Box sx={{flexGrow: 1, paddingTop: 4}}>
         <Grid container spacing={2}>
@@ -130,10 +138,14 @@ export default function HomePage() {
                               <Paper elevation={3} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1}}>
                                 <Typography>Link</Typography>
                                 <TextField value={`https://localhost:3000/test/${card.id}`}/>
-                                <Button variant='contained'>Copy Link</Button>
+                                <Button variant='contained' onClick={()=>handleCopyLink(`https://localhost:3000/test/${card.id}`)}>Copy Link</Button>
                               </Paper>
                             </Popper>
-                            <Button variant='contained' sx={{width: '100px', background: '#DFC207'}}>
+                            <Button 
+                              variant='contained' 
+                              sx={{width: '100px', background: '#DFC207'}}
+                              onClick={()=>navigate(`/test/${card.id}`)}
+                            >
                               Test
                             </Button>
                           </Box>

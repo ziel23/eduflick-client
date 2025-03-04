@@ -21,12 +21,12 @@ const ProfileSettings = () => {
   return (
     <Box sx={{width: '100%', paddingTop: 4 }}>
       <Box sx={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
-        <Typography variant="h4">Profile</Typography>
+        <Typography variant="h4" color="white">Profile</Typography>
       </Box>
       <Box sx={{width: '100%', marginTop: 1}}>
-        <Divider/>
+        <Divider sx={{borderColor: 'white'}}/>
       </Box>
-      <Box sx={{ maxWidth: 400, p: 3, m: "auto", mt: 5, textAlign: "center" }}>
+      <Box sx={{ maxWidth: 400, p: 3, m: "auto", mt: 5, textAlign: "center", background: 'white', borderRadius: '25px' }}>
         <Typography variant="h6">Profile Photo</Typography>
         <label htmlFor="upload-photo">
           <input
@@ -76,7 +76,7 @@ const ProfileSettings = () => {
           value={email}
           disabled
         />
-        <Button variant="contained" sx={{ mt: 3, color: '#DFC207' }}>
+        <Button variant="contained" sx={{ mt: 3, color: 'white' }}>
           Save
         </Button>
       </Box>
