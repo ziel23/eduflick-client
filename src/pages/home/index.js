@@ -76,8 +76,8 @@ export default function HomePage() {
         
         <Box>
           {
-            isXs ? <IconButton sx={{background: '#fff', color: '#3098c6'}}><AddIcon/></IconButton>
-                 : <Button startIcon={<AddIcon/>} variant='contained' sx={{background: 'white', fontWeight: 700, color: '#3098c6'}}>{!isXs && "Create Flashcard"}</Button>
+            isXs ? <IconButton onClick={()=>navigate("/card")} sx={{background: '#fff', color: '#3098c6'}}><AddIcon/></IconButton>
+                 : <Button onClick={()=>navigate("/card")} startIcon={<AddIcon/>} variant='contained' sx={{background: 'white', fontWeight: 700, color: '#3098c6'}}>{!isXs && "Create Flashcard"}</Button>
           }
         </Box>
       </Box>

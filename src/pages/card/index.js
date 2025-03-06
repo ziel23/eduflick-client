@@ -7,319 +7,325 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
-import { Grid2 as Grid, Input, IconButton, Paper, Select, MenuItem, InputLabel } from '@mui/material';
+import { Grid2 as Grid, Input, IconButton, Paper, Select, MenuItem, InputLabel, Radio, Switch } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
-import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRightOutlined';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Modal from '@mui/material/Modal';
-import FormControl from '@mui/material/FormControl';
-import FlipIcon from '@mui/icons-material/Flip';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  boxShadow: 24,  
-  p: 2,
-};
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import SaveIcon from '@mui/icons-material/Save';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
 export default function CardPage() {
   const navigate = useNavigate();
-  const [cardOrientation, setCardOrientation] = useState(0)
-  const [isCardRotate, setIsCardRotate] = useState(0)
-  const [cardName, setCardName] = useState("")
-  const [cards, setCards] = useState([])
-  const [open, setOpen] = useState(false);
-  const [modalForm, setModalForm] = useState({question: "", type: 0, answer: '', options: []})
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down('sm')); // Using 'sm' breakpoint
+  const [cards, setCards] = useState([
+    {
+      question: "question",
+      answer: "answer",
+      answerType: 1,
+      options: "" 
+     },
+     {
+      question: "question2",
+      answer: "answer2",
+      answerType: 2,
+      options: ["test1", "test2", "test3", "test4"]
+     },
+     {
+      question: "question3",
+      answer: "answer3",
+      answerType: 3,
+      options: ""
+     },
+  ]);
+  const [screenType, setScreenType] = useState(0)
+  const [cardIndex, setCardIndex] = useState(0)
+  const [isFront, setIsFront] = useState(true);
+  const [question, setQuestion] = useState("");
+  const [answerType, setAnswerType] = useState(null)
+  const [answer, setAnswer] = useState("");
+  const [options, setOptions] = useState([]);
+  const [value, setValue] = useState(options[0]?.value || null);
+  const [valueToF, setValueToF] = useState(1);
+  const [newOption, setNewOption] = useState("");
 
-  useEffect(() => {
-    const sampleData = {
-      cardName: 'Biology FlashCard',
-      cards: [
-        {
-          question: 'What is the biggest animal?',
-          type: 0,
-          answer: 'Jawu',
-          options: ['-']
-        },
-        {
-          question: 'Are you a human?',
-          type: 1,
-          answer: 'true',
-          options: ['true', 'false']
-        },
-        {
-          question: 'What is my name?',
-          type: 2,
-          answer: 'Jawu',
-          options: ['Jawu', 'Kendi', 'Nieziel', 'Wetiwew']
-        },
-      ]
+  const handleBack = () => {
+    if (cardIndex != 0) {
+      setCardIndex(cardIndex-1)
     }
-    setCardName(sampleData['cardName'])
-    setCards(sampleData['cards'])
-  }, [])
+  }
 
-  const handleChange = (e) => {
-    const { value } = e.target;
-    cardName(value);
+  const handleNext = () => {
+    if (cardIndex != cards.length - 1) {
+      setCardIndex(cardIndex+1)
+    }
+  }
+
+  const handleChange = (event) => {
+    setValue(event.target.value);
   };
 
-  const handleLeft = () => {
-    setCardOrientation(cardOrientation - 1)
-    setIsCardRotate(false)
-  }
+  const handleLabelChange = (id, newLabel) => {
+    setOptions((prevOptions) =>
+      prevOptions.map((option) =>
+        option.id === id ? { ...option, value: newLabel.toLowerCase() } : option
+      )
+    );
+  };
+
+  const handleAddOption = () => {
+    const normalizedNewOption = newOption.trim().toLowerCase();
+    if (normalizedNewOption === "") return;
   
-  const handleRotate = () => {
-    setIsCardRotate(!isCardRotate)
+    const isDuplicate = options.some(
+      (option) => option.value.toLowerCase() === normalizedNewOption
+    );
+  
+    if (isDuplicate) {
+      alert("Option already exists!");
+      return;
+    }
+  
+    const newId = options.length + 1;
+    const newEntry = { id: newId, label: newOption, value: normalizedNewOption };
+    setOptions([...options, newEntry]);
+    setNewOption("");
+  };
+
+  const handleChangeToF = () => {
+    setValueToF()
   }
 
-  const handleRight = () => {
-    setCardOrientation(cardOrientation + 1)
-    setIsCardRotate(false)
+  const handleFlip = () => {
+    setIsFront(!isFront);
   }
 
-  const handleAddQuestion = () => {
-    setOpen(true);
+  const onChangeQuestion = (e) => {
+    setQuestion(e.target.value)
   }
 
-  const handleCloseModal = () => {
-    setOpen(false)
+  const onChangeAnswer = (e) => {
+    setAnswer(e.target.value)
   }
 
-  const handleChangeModalForm = (e) => {
-    const {name, value} = e.target
-    setModalForm((prev)=>({...prev, [name]: value}))
+  const onChangeAnswerType = (type) => {
+    setAnswerType(type)
+    setAnswer("")
+    setValue(null)
+    setValueToF(null)
+  }
+
+  const onSave = () => {
+   let sendData = {
+    question: question,
+    answer: answer,
+    answerType: answerType,
+    options: "" 
+   } 
+   if (answerType === 2) {
+    sendData.options = options
+    sendData.answer = value
+   }else if(answerType === 3){
+    sendData.options =[{id: 1, label: "True", value: true},{id: 2, label: "False", value: false}]
+    sendData.answer = valueToF
+   }
+   let tempCards = [...cards]
+   tempCards.push(sendData)
+   setCards(tempCards)
+  }
+
+  const onAddCard = () => {
+    setScreenType(1);
+  }
+
+  const onCancel = () => {
+    setScreenType(0);
   }
 
   return (
-    <Box sx={{width: '100%', paddingTop: 4 }}>
-      <Modal
-        open={open}
-        onClose={handleCloseModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Add Question
-          </Typography>
-          <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-            <TextField 
-              label="Enter Question" 
-              variant="outlined" 
-              sx={{width: '100%'}}
-              value={modalForm.question}
-              name={'question'}
-              onChange={handleChangeModalForm}
-            />
-            <Select 
-              label="Enter Question Type" 
-              variant="outlined" 
-              sx={{width: '100%'}}
-              value={modalForm.type}
-              name={'type'}
-              onChange={handleChangeModalForm}
-            >
-              <MenuItem value="0">Fill in the blank</MenuItem>
-              <MenuItem value="1">True or False</MenuItem>
-              <MenuItem value="2">Multiple Choice</MenuItem>
-            </Select>
-            {
-              modalForm.type == '0' && (
-                <TextField 
-                  label="Answer" 
-                  variant="outlined" 
-                  sx={{width: '100%'}}
-                  value={modalForm.answer}
-                  name={'answer'}
-                  onChange={handleChangeModalForm}
-                />
-              )
-            }
-            
-            {
-              modalForm.type == '1' && (
-                <FormControl fullWidth>
-                  <Select 
-                    labelId="demo-simple-select-label"
-                    variant="outlined" 
-                    sx={{width: '100%'}}
-                    value={modalForm.answer}
-                    name={'answer'}
-                    onChange={handleChangeModalForm}
-                  >
-                    <MenuItem value="1">True</MenuItem>
-                    <MenuItem value="0">False</MenuItem>
-                  </Select>
-                </FormControl>
-              )
-            }
-
-            {
-              modalForm.type == '2' && (
-                <Select 
-                  label="Enter Question" 
-                  variant="outlined" 
-                  sx={{width: '100%'}}
-                  value={modalForm.answer}
-                  name={'answer'}
-                  onChange={handleChangeModalForm}
-                >
-                  <MenuItem value="a">True</MenuItem>
-                  <MenuItem value="b">False</MenuItem>
-                  <MenuItem value="c">False</MenuItem>
-                  <MenuItem value="d">False</MenuItem>
-                </Select>
-              )
-            }
-            
-            
-            
-          </Box>
-
-        </Box>
-
-      </Modal>
-      <Grid container spacing={2}>
-        <Grid 
-          size={6} 
-          sx={{
-            height: 450, 
-          }}>
-            <Box
-              sx={{
-                display: 'flex', 
-                justifyContent: 'center',
-                flexDirection: 'column',
-                alignItems: 'center'
-              }}
-            >
-              <Paper
-                sx={{
-                  width: '45%',
-                  aspectRatio: '2 / 3',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  padding: 3,
-                  borderRadius: 8,
-                  border: '3px solid',
-                  borderColor: isCardRotate && '#FFDE07',
-                  background: isCardRotate && '#3D3369'
-                }}
-                elevation={3}
-              >
-                <Box
-                  sx={{
-                    borderRadius: 5,
-                    width: '100%',
-                    border: '3px solid',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderColor: isCardRotate && '#FFDE07',
-                    background: isCardRotate && '#3D3369',
-                    color: isCardRotate && '#fff'
-                  }}
-                >
-                  {
-                    cardOrientation == 0 && <Typography>
-                      {cardName ? cardName : "Flash Card Name"}
-                    </Typography>
-                  }
-                  {
-                    cards?.map((card, idx) => {
-                      return (
-                        <>
-                          {
-                            cardOrientation == idx+1 && <Typography>
-                              {isCardRotate ? card.answer : card.question}
-                            </Typography>
-                          }
-                        </>
-                      )
-                    })
-                  }
-
-                </Box>
-              </Paper>
-              <Box sx={{width: '100%', display: 'flex', justifyContent: 'center'}}>
-                <IconButton aria-label="arrow left" onClick={handleLeft} sx={{visibility: cardOrientation == 0 && 'hidden'}}>
-                  <ArrowCircleLeftIcon sx={{fontSize: 44}}/>
-                </IconButton>
-                <IconButton aria-label="arrow left" onClick={handleRotate} sx={{visibility: cardOrientation == 0 && 'hidden'}}>
-                  <FlipIcon sx={{fontSize: 44}}/>
-                </IconButton>
-                <IconButton aria-label="arrow right" onClick={handleRight} sx={{visibility: (cardOrientation > (cards.length - 1)) && 'hidden'}}>
-                  <ArrowCircleRightIcon sx={{fontSize: 44}}/>
-                </IconButton>
+    <Box sx={{width: '100%', paddingTop: 4, display: 'flex'}}>
+      <Grid container spacing={3} sx={{width: '100%'}}>
+        <Grid size={6} sx={{width: '100%'}}>
+          <Box sx={{width: '100%'}}>
+            <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+              <TextField label="Flashcard Name" variant='filled' color='white'/>
+              <Box sx={{gap: 2, display: 'inline-flex', alignItems: 'center'}}>
+                {isXs ? <IconButton onClick={onAddCard} sx={{background: '#fff', color: '#fede06'}}><AddIcon/></IconButton> : <Button onClick={onAddCard} variant='contained' startIcon={<AddIcon sx={{color: "#fede06"}}/>} sx={{background: 'white', color: 'black'}}>New Card</Button>}
+                {isXs ? <IconButton sx={{background: '#fff', color: 'green'}}><SaveIcon/></IconButton> : <Button variant='contained' startIcon={<SaveIcon sx={{color: "green"}}/>} sx={{background: 'white', color: 'black'}}>Save</Button>}
               </Box>
             </Box>
+          </Box>
         </Grid>
-        <Grid size={6}>
-          
-          <TableContainer component={Paper} sx={{marginTop: 2}}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell colSpan={3}>
-                    <TextField 
-                      label="Enter Flash Card Name" 
-                      variant="outlined" 
-                      value={cardName}
-                      onChange={handleChange}
-                      sx={{width: '100%'}}
-                    />
-                  </TableCell>
-                  <TableCell align="right" colSpan={2}>
-                    <Button variant="contained" onClick={handleAddQuestion}>Add Question</Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell align="left">No.</TableCell>
-                  <TableCell>Question</TableCell>
-                  <TableCell>QuestionType</TableCell>
-                  <TableCell>Answer</TableCell>
-                  <TableCell>Options</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {cards.map((row, idx) => (
-                  <TableRow
-                    key={idx+1}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+        <Grid size={12}>
+          <Box sx={{width: "100%", display: 'flex', justifyContent: 'center'}}>
+            {screenType ? <Box sx={{width: isXs ? '100%' : '350px',  display: 'flex', flexDirection: 'column', gap: 2}}>            
+              <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                <Button onClick={onCancel} variant='contained' sx={{width: 90}} disabled={cards.length <= 0}>Cancel</Button>
+                <Box sx={{display: 'flex', alignItems: 'center', color: 'white !important'}}>
+                  <Typography>Front</Typography><Switch value={isFront} onChange={handleFlip}/><Typography>Back</Typography>
+                </Box>
+                <Button variant='contained' sx={{width: 90}} onClick={onSave}>Save</Button>
+              </Box>
+              <Paper sx={{width: '100%', aspectRatio: '2/2.5'}}>
+                {
+                  isFront ? (
+                    <Box id="question" sx={{width: '100%', height: '100%'}}>
+                      <Box sx={{display: 'flex', justifyContent: 'center', borderBottom: '1px solid #c2c2c2'}}>
+                        <Typography sx={{fontWeight: 700, padding: 1.5}}>Question</Typography>
+                      </Box>
+                      <Box sx={{width: '100%', height: '100%'}}>
+                        <textarea value={question} name="question" onChange={onChangeQuestion} type="text" style={{width: '-webkit-fill-available', height: '100%', resize: 'none' }}/>
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Box sx={{ height: '100%', width: '100%'}}>
+                      {
+                        answerType === null && (<>
+                            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                              <Typography sx={{fontWeight: 700, padding: 1.5}}>Answer Type</Typography>
+                            </Box>
+                            <Divider/>
+                            <Button onClick={()=>onChangeAnswerType(1)} variant='contained' sx={{width: '100%', background: '#fff', color: 'black', border: 'none', boxShadow: 'none', paddingBlock: 1.5}}>
+                              <Typography fontSize={14}>Fill in the Blank</Typography>
+                            </Button>
+                            <Divider/>
+                            <Button onClick={()=>onChangeAnswerType(2)} variant='contained' sx={{width: '100%', background: '#fff', color: 'black', border: 'none', boxShadow: 'none', paddingBlock: 1.5}}>
+                              <Typography fontSize={14}>Multiple Choice</Typography>
+                            </Button>
+                            <Divider/>
+                            <Button onClick={()=>onChangeAnswerType(3)} variant='contained' sx={{width: '100%', background: '#fff', color: 'black', border: 'none', boxShadow: 'none', paddingBlock: 1.5}}>
+                              <Typography fontSize={14}>True or False</Typography>
+                            </Button>
+                            <Divider/>
+                          </>)
+                      }
+                      {
+                        answerType === 1 && (<>
+                            <Box sx={{display: 'flex'}}>
+                              <IconButton onClick={()=>onChangeAnswerType(null)}>
+                                <ArrowBackIosIcon/>
+                              </IconButton>
+                              <Typography sx={{fontWeight: 700, padding: 1.5}}>Fill in the Blank</Typography>
+                            </Box>
+                            <Box sx={{width: '100%', height: '100%'}}>
+                              <textarea value={answer} name="answer" onChange={onChangeAnswer} type="text" style={{width: '-webkit-fill-available', height: '100%', resize: 'none' }}/>
+                            </Box>
+                          </>)
+                      }
+                      {
+                        answerType === 2 && (<>
+                            <Box sx={{display: 'flex'}}>
+                              <IconButton onClick={()=>onChangeAnswerType(null)}>
+                                <ArrowBackIosIcon/>
+                              </IconButton>
+                              <Typography sx={{fontWeight: 700, padding: 1.5}}>Multiple Choice</Typography>
+                            </Box>
+                            <Divider/>
+                            <Box sx={{display: 'flex', width: '100%', paddingInline: 4, marginTop: 3}}>
+                              <FormControl>
+                                <RadioGroup value={value} onChange={handleChange}>
+                                  {options.map((option) => (
+                                    <Box key={option.id} display="flex" alignItems="center">
+                                      <FormControlLabel
+                                        value={option.value}
+                                        control={<Radio />}
+                                      />
+                                      <TextField
+                                        size="small"
+                                        variant="outlined"
+                                        value={option.label}
+                                        onChange={(e) => handleLabelChange(option.id, e.target.value)}
+                                        sx={{width: '100%'}}
+                                      />
+                                    </Box>
+                                  ))}
+                                </RadioGroup>
+                                <Box mt={2} display="flex" gap={1}>
+                                  <Button variant="contained" onClick={handleAddOption}>
+                                    Add
+                                  </Button>
+                                  <TextField
+                                    size="small"
+                                    variant="outlined"
+                                    placeholder="Add new option"
+                                    value={newOption}
+                                    onChange={(e) => setNewOption(e.target.value)}
+                                  />
+                                </Box>
+                              </FormControl>
+                            </Box>
+                          </>)
+                      }
+                      {
+                        answerType === 3 && (<>
+                            <Box sx={{display: 'flex'}}>
+                              <IconButton onClick={()=>onChangeAnswerType(null)}>
+                                <ArrowBackIosIcon/>
+                              </IconButton>
+                              <Typography sx={{fontWeight: 700, padding: 1.5}}>True or False</Typography> 
+                            </Box>
+                            <Divider/>
+                            <Box sx={{display: 'flex', width: '100%', paddingInline: 4, marginTop: 3}}>
+                              <FormControl>
+                                <RadioGroup value={valueToF} onChange={handleChangeToF}>
+                                  {[{id: 1, label: "True", value: true},{id: 2, label: "False", value: false}].map((option) => (
+                                    <Box key={option.id} display="flex" alignItems="center">
+                                      <FormControlLabel
+                                        value={option.value}
+                                        control={<Radio />}
+                                        label={option.label}
+                                      />
+                                    </Box>
+                                  ))}
+                                </RadioGroup>
+                              </FormControl>
+                            </Box>
+                          </>)
+                      }
+                    </Box>
+                  )
+                }
+              </Paper>
+            </Box> : <Box sx={{width: isXs ? '100%' : '350px',  display: 'flex', flexDirection: 'column', gap: 2}}>
+              <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                <Button variant='contained' sx={{width: 90}} disabled={cards.length <= 0} onClick={handleBack}>Back</Button>
+                <Box sx={{display: 'flex', alignItems: 'center', color: 'white !important'}}>
+                  <Typography>Front</Typography><Switch value={isFront} onChange={handleFlip}/><Typography>Back</Typography>
+                </Box>
+                <Button variant='contained' sx={{width: 90}} onClick={handleNext} >Next</Button>
+              </Box>
+              { cards.map((card, idx) =>{
+                console.log("[card]", idx, cardIndex, idx == cardIndex);
+                
+                return (
+                  <Paper 
+                    sx={{
+                      width: '100%', 
+                      aspectRatio: '2/2.5', 
+                      display: idx == cardIndex ? "block" : "none",
+                      transformStyle: "preserve-3d",
+                      transition: "transform 1s",
+                      transform: !isFront ? "rotateY(0deg)" : "rotateY(360deg)",
+                    }}
                   >
-                    <TableCell component="th" scope="row">
-                      {idx+1}
-                    </TableCell>
-                    <TableCell>{row.question}</TableCell>
-                    <TableCell>
-                      {row.type == 0 && "Fill in the blank"}
-                      {row.type == 1 && "True or False"}
-                      {row.type == 2 && "Multiple Choice"}
-                    </TableCell>
-                    <TableCell>{row.answer}</TableCell>
-                    <TableCell>
-                      {row.type == 0 && "-"}
-                      {row.type == 1 && row.options.join(" ")}
-                      {row.type == 2 && (
-                        "(A) " + row.options[0] + "\n(B) " + row.options[1] + "\n(C) " + row.options[2] + "\n(D) " + row.options[3]
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    <Box id="question" sx={{width: '100%', height: '100%'}}>
+                      <Box sx={{display: 'flex', justifyContent: 'center', borderBottom: '1px solid #c2c2c2'}}>
+                        <Typography sx={{fontWeight: 700, padding: 1.5}}>{isFront ? "Question" : "Answer"}</Typography>
+                      </Box>
+                      <Box sx={{width: '100%', height: '100%'}}>
+                        <Typography>{isFront ? card.question : card.answer}</Typography>
+                      </Box>
+                    </Box>
+                  </Paper>
+                )
+                })
+              }
+            </Box>}
+          </Box>
         </Grid>
       </Grid>
     </Box>
