@@ -9,6 +9,7 @@ import { useNavigate, useParams  } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import { Grid2 as Grid, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { getLeadersBoardByFlashcard } from "../../util/service"
 
 
 const useStyles = makeStyles({
@@ -26,17 +27,30 @@ export default function LeadersBoardPage() {
   const navigate = useNavigate();
   const [ranks, setRanks] = useState([])
 
-  useEffect(() => {
-    let sampleData = [
-      {name: 'Kendi15', score: 92, total: 100},
-      {name: 'Jawu67', score: 87, total: 100},
-      {name: 'Neiziel23', score: 80, total: 100},
-      {name: 'Rolyn123', score: 75, total: 100},
-      {name: 'Test213', score: 73, total: 100},
-    ]
+  // useEffect(() => {
+  //   let sampleData = [
+  //     {name: 'Kendi15', score: 92, total: 100},
+  //     {name: 'Jawu67', score: 87, total: 100},
+  //     {name: 'Neiziel23', score: 80, total: 100},
+  //     {name: 'Rolyn123', score: 75, total: 100},
+  //     {name: 'Test213', score: 73, total: 100},
+  //   ]
+  //   const getLeadersBoardByFlashcardService = async() => {
+  //     const response = await getLeadersBoardByFlashcard(id)
+  //     setRanks(response.data)
+  //   }
 
-    setRanks(sampleData)
-  }, [])
+  //   return getLeadersBoardByFlashcardService()
+  // }, [])
+
+   useEffect(() => {
+      const getLeadersBoardByFlashcardService = async() => {
+        const res = await getLeadersBoardByFlashcard(id)
+        setRanks(res.data)
+      }
+  
+      return getLeadersBoardByFlashcardService
+    }, [])
 
   console.log("[[xxxx]]", id);
   
@@ -57,7 +71,7 @@ export default function LeadersBoardPage() {
                 <Typography sx={{fontWeight: 700, fontSize: 32, color: '#3D3369'}}>#{index+1}</Typography>
               </Box>
               <Box sx={{width: '75%'}}>
-                <Typography sx={{fontSize: 22}}>{rank.name}</Typography>
+                <Typography sx={{fontSize: 22}}>{rank.username}</Typography>
               </Box>
               <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>  
                 <Typography sx={{fontWeight: 500, fontSize: 18, color: '#3D3369'}}>Score:</Typography>

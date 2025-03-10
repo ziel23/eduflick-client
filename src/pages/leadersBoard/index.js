@@ -1,14 +1,11 @@
 import {useState, useEffect} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import logo from '../../images/logo.png'
-import Card from '@mui/material/Card';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import { Grid2 as Grid, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { getLeadersBoard } from "../../util/service"
 
 
 const useStyles = makeStyles({
@@ -21,22 +18,18 @@ const useStyles = makeStyles({
   });
 
 export default function LeadersBoardPage() {
-    const classes = useStyles();
+  const classes = useStyles();
 
   const navigate = useNavigate();
   const [leaderBoards, setLeaderBoards] = useState([])
 
   useEffect(() => {
-    let sampleData = [
-        {id: 1, name: 'Biology Cards', rank: '1', score: 100, total: 100},
-        {id: 2, name: 'Science Cards', rank: '4', score: 80, total: 85},
-        {id: 3, name: 'Math Cards', rank: '3', score: 99, total: 100},
-        {id: 4, name: 'Engineering Cards', rank: '1', score: 75, total: 80},
-        {id: 5, name: 'Programmer Cards', rank: '4', score: 69, total: 75},
-        {id: 6, name: 'Foods Cards', rank: '5', score: 40, total: 50},
-    ]
+    const getLeadersBoardService = async() => {
+      const res = await getLeadersBoard()
+      setLeaderBoards(res.data)
+    }
 
-    setLeaderBoards(sampleData)
+    return getLeadersBoardService
   }, [])
 
   const handleClick = (id) => {
@@ -56,7 +49,7 @@ export default function LeadersBoardPage() {
             {
                 leaderBoards?.map((item) => {
                     return (
-                        <Grid size={{xs: 12, sm: 6, md: 4, lg:3, xl: 3}} onClick={()=>handleClick(item.id)}>
+                        <Grid size={{xs: 12, sm: 6, md: 4, lg:3, xl: 3}} onClick={()=>handleClick(item.flash_card_id)}>
                             <Paper 
                                 elevation={3} 
                                 className={classes.clickablePaper}
@@ -77,7 +70,7 @@ export default function LeadersBoardPage() {
                                     Rank
                                 </Typography>
                                 <Typography variant="h1" sx={{color: '#3D3369'}}>
-                                    #{item.rank}
+                                    #{item.ranking}
                                 </Typography>
                                 <Typography variant="h5" >
                                     in

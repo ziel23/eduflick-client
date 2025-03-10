@@ -6,6 +6,7 @@ import SignUpPage from '../pages/signup';
 import HomePage from '../pages/home';
 import CardPage from '../pages/card';
 import TestPage from '../pages/test';
+import ScorePage from '../pages/score';
 import LeadersBoardPage from '../pages/leadersBoard';
 import LeadersBoardCardPage from '../pages/leadersBoardCards';
 import ProfilePage from '../pages/profile';
@@ -21,6 +22,7 @@ const AppRouter = () => (
         <Route path="/home" element={<HomePage />} />
         <Route path="/card" element={<CardPage />} />
         <Route path="/test/:id" element={<TestPage />} />
+        <Route path="/score" element={<ScorePage />} />
         <Route path="/leaders-board" element={<LeadersBoardPage />} />
         <Route path="/leaders-board/:id" element={<LeadersBoardCardPage />} />
         <Route path="/profile" element={<ProfilePage />} />

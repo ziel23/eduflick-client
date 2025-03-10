@@ -23,15 +23,15 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     try {
       e.preventDefault();
-      // const loginInfo = await login(formData)
-      // console.log("[loginInfo]", loginInfo);
+      const loginInfo = await login(formData)
+      console.log("[loginInfo]", loginInfo);
       
-      // if(loginInfo.status != "200"){
-      //   setInfoModal({open: true, message: loginInfo.message})
-      // } else{
+      if(loginInfo.status != "200"){
+        setInfoModal({open: true, message: loginInfo.message})
+      } else{
         navigate('/home')
-        // localStorage.setItem("token", loginInfo.data.access_token);
-      // }
+        localStorage.setItem("token", loginInfo.token);
+      }
     } catch (error) {
       console.error("[LOGIN][ERROR]",error)
       setInfoModal({

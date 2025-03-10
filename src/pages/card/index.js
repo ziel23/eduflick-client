@@ -135,7 +135,8 @@ export default function CardPage() {
    }
    let tempCards = [...cards]
    tempCards.push(sendData)
-   setCards(tempCards)
+   setCards(tempCards);
+   onCancel();
   }
 
   const onAddCard = () => {

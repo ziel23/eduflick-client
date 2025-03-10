@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import logo from '../../images/logo.png'
@@ -12,43 +12,25 @@ import AddIcon from '@mui/icons-material/Add';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Popper from '@mui/material/Popper';
-
+import { getCards } from "../../util/service"
 
 export default function HomePage() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down('sm')); // Using 'sm' breakpoint
   const [hover, setHover] = useState(null);
-  const [cards, setCards] = useState([
-    {
-      name: 'Card 1',
-      id: 1
-    },
-    {
-      name: 'Card 2',
-      id: 2
-    },
-    {
-      name: 'Card 3',
-      id: 3
-    },
-    {
-      name: 'Card 4',
-      id: 4
-    },
-    {
-      name: 'Card 5',
-      id: 5
-    },
-    {
-      name: 'Card 6',
-      id: 6
-    },
-    {
-      name: 'Card 7',
-      id: 7
+  const [cards, setCards] = useState([])
+
+  useEffect(() => {
+    const getCardsService = async() => {
+      const response = await getCards();
+      if(response){
+        console.log("[res]", response)
+        setCards(response.data)
+      }
     }
-  ])
+    return getCardsService
+  }, [])
 
   const [anchorEl, setAnchorEl] = useState(null);
 
