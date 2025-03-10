@@ -4,6 +4,8 @@ import axios from 'axios';
 const axiosInstance = axios.create({
   // baseURL: 'http://localhost:8000/api/', // Replace with your API base URL
   baseURL: 'https://eduflickserver.vercel.app/api/',
+  withCredentials: true, // Important for authentication (cookies, JWT)
+
 });
 
 // Add a request interceptor
@@ -13,6 +15,8 @@ axiosInstance.interceptors.request.use(
     if (config.url !== "auth/login" && config.url !== "auth/register") {
       config.headers.Authorization = `${token}`;
     }
+    config.headers["Content-Type"] = "application/json";
+
     console.log('Request Interceptor:', config);
     return config;
   },
