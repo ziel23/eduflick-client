@@ -2,7 +2,8 @@ import axios from 'axios';
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-  baseURL: process.env.API_BASE_URL, // Replace with your API base URL
+  // baseURL: 'http://localhost:8000/api/', // Replace with your API base URL
+  baseURL: 'https://eduflickserver.vercel.app/api/',
 });
 
 // Add a request interceptor
