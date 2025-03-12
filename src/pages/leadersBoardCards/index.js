@@ -49,11 +49,8 @@ export default function LeadersBoardPage() {
         setRanks(res.data)
       }
   
-      return getLeadersBoardByFlashcardService
+      getLeadersBoardByFlashcardService()
     }, [])
-
-  console.log("[[xxxx]]", id);
-  
 
   return (
     <Box sx={{width: '100%', paddingTop: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2}}>

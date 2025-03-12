@@ -1,10 +1,12 @@
 import { Box, Grid2 as Grid, Typography, Paper, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DonutChart from "./DonutChart";
 import { postAddLeaderBoard } from "../../util/service"
 
 function ScoreScreen() {
+	const navigate = useNavigate();
 	const location = useLocation();
 	const score = location.state?.score ?? 0;
 	const [cardName, setCardName] = useState("")
@@ -32,6 +34,9 @@ function ScoreScreen() {
 			}
 			
 			const response = await postAddLeaderBoard(sendData)
+			if (response) {
+				navigate(`/leaders-board/${cardId}`)
+			}
 		} catch (error) {
 			console.log("[error]", error);
 			

@@ -56,7 +56,7 @@ export default function TestPage(props) {
       }
 
     }
-    return getCardInfoService
+    getCardInfoService()
   }, [])
 
   const handleBackward = () => {

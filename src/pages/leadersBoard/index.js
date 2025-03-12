@@ -29,7 +29,7 @@ export default function LeadersBoardPage() {
       setLeaderBoards(res.data)
     }
 
-    return getLeadersBoardService
+    getLeadersBoardService()
   }, [])
 
   const handleClick = (id) => {

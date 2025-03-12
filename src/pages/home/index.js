@@ -21,14 +21,15 @@ export default function HomePage() {
   const [hover, setHover] = useState(null);
   const [cards, setCards] = useState([])
 
-  useEffect(async() => {
-    
-    const response = await getCards();
-    if(response){
-      console.log("[res]", response)
-      setCards(response.data)
+  useEffect(() => {
+    const getCardsService = async() => {
+      const response = await getCards();
+      if(response){
+        console.log("[res]", response)
+        setCards(response.data)
+      }
     }
-  
+    getCardsService()
   }, [])
 
   const [anchorEl, setAnchorEl] = useState(null);
