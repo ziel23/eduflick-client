@@ -5,6 +5,9 @@ const axiosInstance = axios.create({
   baseURL: 'https://eduflickserver.vercel.app/api/', // Update with your actual API URL
   withCredentials: false, // Important for authentication (cookies, JWT)
   headers: {
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
     "Content-Type": "application/json"
   }
 });
