@@ -22,14 +22,13 @@ export default function HomePage() {
   const [cards, setCards] = useState([])
 
   useEffect(() => {
-    const getCardsService = async() => {
-      const response = await getCards();
-      if(response){
-        console.log("[res]", response)
-        setCards(response.data)
-      }
+    
+    const response =  getCards();
+    if(response){
+      console.log("[res]", response)
+      setCards(response.data)
     }
-    return getCardsService
+  
   }, [])
 
   const [anchorEl, setAnchorEl] = useState(null);
