@@ -16,10 +16,8 @@ axiosInstance.interceptors.request.use(
 
     if (token && !config.url.includes("auth/login") && !config.url.includes("auth/register") && token) {
       config.headers.Authorization = `${token}`;
-    }else {
-      window.location.href = "/"; // Redirect to login page
     }
-
+    
     console.log('Request Interceptor:', config);
     return config;
   },
