@@ -3,7 +3,7 @@ import axios from 'axios';
 // Create an Axios instance
 const axiosInstance = axios.create({
   baseURL: 'https://eduflickserver.vercel.app/api/', // Update with your actual API URL
-  withCredentials: true, // Important for authentication (cookies, JWT)
+  withCredentials: false, // Important for authentication (cookies, JWT)
   headers: {
     "Content-Type": "application/json"
   }
