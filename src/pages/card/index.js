@@ -5,7 +5,7 @@ import logo from '../../images/logo.png'
 import Card from '@mui/material/Card';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams  } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import { Grid2 as Grid, Input, IconButton, Paper, Select, MenuItem, InputLabel, Radio, Switch } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -17,34 +17,44 @@ import SaveIcon from '@mui/icons-material/Save';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import EditIcon from '@mui/icons-material/Edit';
+import { motion } from "framer-motion";
+import { createCard, getCardInfo } from "../../util/service"
+
 
 export default function CardPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id"); // Get 'filter' from URL
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down('sm')); // Using 'sm' breakpoint
-  const [cards, setCards] = useState([
-    {
-      question: "question",
-      answer: "answer",
-      answerType: 1,
-      options: "" 
-     },
-     {
-      question: "question2",
-      answer: "answer2",
-      answerType: 2,
-      options: ["test1", "test2", "test3", "test4"]
-     },
-     {
-      question: "question3",
-      answer: "answer3",
-      answerType: 3,
-      options: ""
-     },
-  ]);
-  const [screenType, setScreenType] = useState(0)
+  const [name, setName] = useState("");
+  const [cards, setCards] = useState(
+    [
+      // {
+      //   question: "",
+      //   answer: "",
+      //   answerType: 1,
+      //   options: "" 
+      // },
+    //  {
+    //   question: "question2",
+    //   answer: "answer2",
+    //   answerType: 2,
+    //   options: ["test1", "test2", "test3", "test4"]
+    //  },
+    //  {
+    //   question: "question3",
+    //   answer: "answer3",
+    //   answerType: 3,
+    //   options: ""
+    //  },
+    ]
+  );
+  const [screenType, setScreenType] = useState(1)
   const [cardIndex, setCardIndex] = useState(0)
-  const [isFront, setIsFront] = useState(true);
+  const [isFront, setIsFront] = useState(() => false);
+  const [editIndex, setEditIndex] = useState(null)
   const [question, setQuestion] = useState("");
   const [answerType, setAnswerType] = useState(null)
   const [answer, setAnswer] = useState("");
@@ -53,6 +63,21 @@ export default function CardPage() {
   const [valueToF, setValueToF] = useState(1);
   const [newOption, setNewOption] = useState("");
 
+  useEffect(() => {
+    const getCardInfoService = async () => {
+      const res = await getCardInfo(id);
+      console.log("[res][getCardInfo]", id, res);
+      if(res){
+        setName(res.data.flashCardName);
+        setCards(res.data.questions)
+        setScreenType(0)
+      }
+    }
+    if(id){
+      getCardInfoService()
+    }
+  }, [])
+  
   const handleBack = () => {
     if (cardIndex != 0) {
       setCardIndex(cardIndex-1)
@@ -62,6 +87,7 @@ export default function CardPage() {
   const handleNext = () => {
     if (cardIndex != cards.length - 1) {
       setCardIndex(cardIndex+1)
+      setIsFront(false)
     }
   }
 
@@ -92,16 +118,20 @@ export default function CardPage() {
   
     const newId = options.length + 1;
     const newEntry = { id: newId, label: newOption, value: normalizedNewOption };
+    console.log("oppt", typeof options);
+    
     setOptions([...options, newEntry]);
     setNewOption("");
   };
 
-  const handleChangeToF = () => {
-    setValueToF()
+  const handleChangeToF = (e) => {
+    setValueToF(e.target.value)
   }
 
-  const handleFlip = () => {
-    setIsFront(!isFront);
+  const handleFlip = (e) => {
+    console.log("[e.target.checked]", e.target.checked);
+    
+    setIsFront(e.target.checked);
   }
 
   const onChangeQuestion = (e) => {
@@ -123,9 +153,10 @@ export default function CardPage() {
    let sendData = {
     question: question,
     answer: answer,
-    answerType: answerType,
-    options: "" 
+    type: answerType,
+    options: []
    } 
+
    if (answerType === 2) {
     sendData.options = options
     sendData.answer = value
@@ -133,19 +164,82 @@ export default function CardPage() {
     sendData.options =[{id: 1, label: "True", value: true},{id: 2, label: "False", value: false}]
     sendData.answer = valueToF
    }
+
+   console.log("[sendData]", sendData);
+   if (!sendData.question || !sendData.answer) {
+    
+    alert("Please fill up question completely.")
+    return
+   }
+
    let tempCards = [...cards]
-   tempCards.push(sendData)
+   if(editIndex != null) {
+    tempCards[editIndex] = sendData
+   }else{
+    tempCards.push(sendData)
+   }
    setCards(tempCards);
+   setQuestion("");
+   setAnswer("");
+   setAnswerType(null);
+   setOptions([])
+   setIsFront(true)
+   setEditIndex(null)
    onCancel();
   }
 
   const onAddCard = () => {
     setScreenType(1);
+    setIsFront(false)
+  }
+
+  const onEditCard = (card, index) => {
+    setScreenType(1);
+    console.log("[card]", card);
+    
+    setEditIndex(index)
+    setQuestion(card.question);
+    setAnswerType(card.type);
+    if(card.type === 1) {
+      setAnswer(card.answer);
+    }else if(card.type === 2){
+      setOptions(card.options)
+      setValue(card.answer)
+    }else if(card.type === 2){
+      setOptions(card.options)
+      setValueToF(card.answer)
+    }
   }
 
   const onCancel = () => {
+    setIsFront(false)
     setScreenType(0);
+    setQuestion("");
+    setAnswer("");
+    setAnswerType(null);
+    setEditIndex(null)
   }
+
+  const onSaveFlashCard = async () => {
+    let sendData = {
+      id: id || "",
+      name: name,
+      questions: cards.map((item) => {
+        console.log("[item]", typeof item.options, item.options);
+        return {
+          ...item,
+          options: item.options == "" ? [] : item.options
+        }
+      })
+    }
+    
+    console.log("[sendData]", sendData);
+    const res = await createCard(sendData)
+    console.log("[res][createCard]", res);
+  }
+
+  console.log("[isFront]", isFront);
+  
 
   return (
     <Box sx={{width: '100%', paddingTop: 4, display: 'flex'}}>
@@ -153,10 +247,14 @@ export default function CardPage() {
         <Grid size={6} sx={{width: '100%'}}>
           <Box sx={{width: '100%'}}>
             <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-              <TextField label="Flashcard Name" variant='filled' color='white'/>
+              <TextField label="Flashcard Name" variant='filled' color='white' sx={{background: 'white'}} value={name} onChange={(e)=>setName(e.target.value)}/>
               <Box sx={{gap: 2, display: 'inline-flex', alignItems: 'center'}}>
-                {isXs ? <IconButton onClick={onAddCard} sx={{background: '#fff', color: '#fede06'}}><AddIcon/></IconButton> : <Button onClick={onAddCard} variant='contained' startIcon={<AddIcon sx={{color: "#fede06"}}/>} sx={{background: 'white', color: 'black'}}>New Card</Button>}
-                {isXs ? <IconButton sx={{background: '#fff', color: 'green'}}><SaveIcon/></IconButton> : <Button variant='contained' startIcon={<SaveIcon sx={{color: "green"}}/>} sx={{background: 'white', color: 'black'}}>Save</Button>}
+                {isXs 
+                  ? <IconButton disabled={screenType === 1} onClick={onAddCard} sx={{background: '#fff', color: '#fede06'}}><AddIcon/></IconButton> 
+                  : <Button disabled={screenType === 1} onClick={onAddCard} variant='contained' startIcon={<AddIcon sx={{color: "#fede06"}}/>} sx={{background: 'white', color: 'black'}}>New Card</Button>}
+                {isXs 
+                ? <IconButton onClick={onSaveFlashCard} disabled={screenType === 1} sx={{background: '#fff', color: 'green'}}><SaveIcon/></IconButton> 
+                : <Button onClick={onSaveFlashCard} disabled={screenType === 1} variant='contained' startIcon={<SaveIcon sx={{color: "green"}}/>} sx={{background: 'white', color: 'black'}}>Save</Button>}
               </Box>
             </Box>
           </Box>
@@ -167,19 +265,23 @@ export default function CardPage() {
               <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
                 <Button onClick={onCancel} variant='contained' sx={{width: 90}} disabled={cards.length <= 0}>Cancel</Button>
                 <Box sx={{display: 'flex', alignItems: 'center', color: 'white !important'}}>
-                  <Typography>Front</Typography><Switch value={isFront} onChange={handleFlip}/><Typography>Back</Typography>
+                  <Typography>Front</Typography>
+                  <Switch 
+                    checked={isFront} onChange={handleFlip}
+                  />
+                  <Typography>Back</Typography>
                 </Box>
                 <Button variant='contained' sx={{width: 90}} onClick={onSave}>Save</Button>
               </Box>
               <Paper sx={{width: '100%', aspectRatio: '2/2.5'}}>
                 {
-                  isFront ? (
+                  !isFront ? (
                     <Box id="question" sx={{width: '100%', height: '100%'}}>
                       <Box sx={{display: 'flex', justifyContent: 'center', borderBottom: '1px solid #c2c2c2'}}>
                         <Typography sx={{fontWeight: 700, padding: 1.5}}>Question</Typography>
                       </Box>
                       <Box sx={{width: '100%', height: '100%'}}>
-                        <textarea value={question} name="question" onChange={onChangeQuestion} type="text" style={{width: '-webkit-fill-available', height: '100%', resize: 'none' }}/>
+                        <textarea value={question} placeholder={"Enter your question here."} name="question" onChange={onChangeQuestion} type="text" style={{width: '-webkit-fill-available', height: '100%', resize: 'none' }}/>
                       </Box>
                     </Box>
                   ) : (
@@ -293,38 +395,85 @@ export default function CardPage() {
               </Paper>
             </Box> : <Box sx={{width: isXs ? '100%' : '350px',  display: 'flex', flexDirection: 'column', gap: 2}}>
               <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-                <Button variant='contained' sx={{width: 90}} disabled={cards.length <= 0} onClick={handleBack}>Back</Button>
+                <Button variant='contained' sx={{width: 90, visibility: cardIndex <= 0 ? 'hidden' : 'visible'}}onClick={handleBack}>Back</Button>
                 <Box sx={{display: 'flex', alignItems: 'center', color: 'white !important'}}>
-                  <Typography>Front</Typography><Switch value={isFront} onChange={handleFlip}/><Typography>Back</Typography>
+                  <Typography>Front</Typography>
+                  
+                  <Switch
+                    checked={isFront}
+                    onChange={(e) => setIsFront(e.target.checked)}
+                    inputProps={{ "aria-label": "controlled" }}
+                  />
+                  <Typography>Back</Typography>
                 </Box>
-                <Button variant='contained' sx={{width: 90}} onClick={handleNext} >Next</Button>
+                <Button variant='contained' sx={{width: 90, visibility: cards.length === cardIndex+1 ? 'hidden' : 'visible'}} onClick={handleNext} >Next</Button>
               </Box>
+              <motion.div
+                style={{
+                  position: "relative",
+                  perspective: 1000,
+                }}
+              >
+                <motion.div
+                  animate={{ rotateY: isFront ? 180 : 0 }}
+                  transition={{ duration: 0.6 }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    position: "absolute",
+                    transformStyle: "preserve-3d",
+                  }}
+                >
               { cards.map((card, idx) =>{
-                console.log("[card]", idx, cardIndex, idx == cardIndex);
-                
                 return (
+                  <>
                   <Paper 
                     sx={{
                       width: '100%', 
                       aspectRatio: '2/2.5', 
                       display: idx == cardIndex ? "block" : "none",
-                      transformStyle: "preserve-3d",
-                      transition: "transform 1s",
-                      transform: !isFront ? "rotateY(0deg)" : "rotateY(360deg)",
+                      backfaceVisibility: "hidden",
+                      position: "absolute",
                     }}
                   >
                     <Box id="question" sx={{width: '100%', height: '100%'}}>
-                      <Box sx={{display: 'flex', justifyContent: 'center', borderBottom: '1px solid #c2c2c2'}}>
-                        <Typography sx={{fontWeight: 700, padding: 1.5}}>{isFront ? "Question" : "Answer"}</Typography>
+                      <Box sx={{display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #c2c2c2'}}>
+                        <Box sx={{width: 40}}/>
+                        <Typography sx={{fontWeight: 700, padding: 1.5}}>{"Question"}</Typography>
+                        <IconButton onClick={()=>onEditCard(card, idx)}><EditIcon/></IconButton>
                       </Box>
-                      <Box sx={{width: '100%', height: '100%'}}>
-                        <Typography>{isFront ? card.question : card.answer}</Typography>
+                      <Box sx={{padding: 1.5, width: 'calc(100% - 24px)', height: 'calc(100% - 49px - 24px)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <Typography variant='h6'>{card.question}</Typography>
                       </Box>
                     </Box>
                   </Paper>
+                  <Paper 
+                    sx={{
+                      width: '100%', 
+                      aspectRatio: '2/2.5', 
+                      display: idx == cardIndex ? "block" : "none",
+                      transform: "rotateY(180deg)",
+                      backfaceVisibility: "hidden",
+                      position: "absolute",
+                    }}
+                  >
+                    <Box id="question" sx={{width: '100%', height: '100%'}}>
+                      <Box sx={{display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #c2c2c2'}}>
+                        <Box sx={{width: 40}}/>
+                        <Typography sx={{fontWeight: 700, padding: 1.5}}>{"Answer"}</Typography>
+                        <IconButton onClick={()=>onEditCard(card, idx)}><EditIcon/></IconButton>
+                      </Box>
+                      <Box sx={{padding: 1.5, width: 'calc(100% - 24px)', height: 'calc(100% - 49px - 24px)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <Typography variant='h6'>{card.answer}</Typography>
+                      </Box>
+                    </Box>
+                  </Paper>
+                  </>
                 )
                 })
               }
+               </motion.div>
+              </motion.div>
             </Box>}
           </Box>
         </Grid>

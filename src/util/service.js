@@ -12,6 +12,10 @@ export const getCards = () => {
     return HTTP.get('cards')
 }
 
+export const createCard = (data) => {
+    return HTTP.post('cards', data)
+}
+
 export const getCardInfo = (id) => {
     return HTTP.get(`cards/${id}`)
 }

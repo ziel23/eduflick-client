@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import { Grid2 as Grid, Input, IconButton, Paper, Select, MenuItem, InputLabel } from '@mui/material';
+import { Grid2 as Grid, Input, IconButton, Paper, Select, MenuItem, InputLabel, Tooltip } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { getCardInfo, postCheckAnswers } from "../../util/service"
@@ -25,6 +25,8 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
+  height: '50%',
+  overflowY: 'hidden',
   bgcolor: 'background.paper',
   boxShadow: 24,
   display: 'flex',
@@ -66,11 +68,7 @@ export default function TestPage(props) {
   }
 
   const handleForward = () => {
-    if (questionIndex != questions.length - 1) {
-      setQuestionIndex(questionIndex + 1)
-    }else{
-      handleOpen()
-    }
+    setQuestionIndex(questionIndex + 1)
   }
 
   const onAnswer = (e, idx) => {
@@ -93,6 +91,9 @@ export default function TestPage(props) {
       navigate("/score", { state: { data: data } });
     }
   }
+
+  console.log("[questionIndex]",questionIndex);
+  
   
   return (
     <Box>
@@ -111,12 +112,12 @@ export default function TestPage(props) {
               </IconButton>
             </Box>
             <Divider sx={{marginBlock: -2}}/>
-            <Box sx={{p: 2}}>
-              <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+            <Box sx={{p: 2, height: 'calc( 100% - 105px )'}}>
+              <Box sx={{display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'scroll', height: 'calc(100% - 60px)'}}>
                 {
                   questions?.map((item, idx)=> {
                     return (
-                      <Paper sx={{padding: 1}}>
+                      <Paper sx={{padding: 1, border: 1}}>
                         <Typography>Q: {item.question}</Typography>
                         <Typography>A: {answers[idx]}</Typography>
                       </Paper>
@@ -130,28 +131,53 @@ export default function TestPage(props) {
             </Box>
           </Paper>
         </Modal>
-        <Box sx={{width: isXs ? '100%' : '450px',  display: 'flex', flexDirection: 'column',   gap: 2, marginTop: 2}}>            
+        <Box sx={{width: isXs ? '100%' : '370px',  display: 'flex', flexDirection: 'column',   gap: 2, marginTop: 2}}>            
           <Box sx={{display: 'flex', justifyContent: 'center'}}>
             <Typography variant='h5' sx={{fontWeight: 700, color:'#fff'}}>{cardName}</Typography>
           </Box>
-          <Box sx={{display: 'flex', alignItems: 'center'}} >
-            <IconButton  onClick={handleBackward} disabled={questionIndex == 0}>
+          <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+            <Button 
+              variant='contained' 
+              onClick={handleBackward}  
+              sx={{visibility: questionIndex !== 0 ? 'visible' : 'hidden'}}
+            >Back</Button>
+            <Button variant='contained' onClick={handleOpen}>Submit</Button>
+            <Button 
+              variant='contained' 
+              sx={{visibility: questions.length !== questionIndex + 1 ? 'visible' : 'hidden'}} 
+              onClick={handleForward} 
+            >Next</Button>
+          </Box>
+          <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} >
+            {/* <IconButton  onClick={handleBackward}  sx={{visibility: questionIndex !== 0 ? 'visible' : 'hidden'}}>
               <ArrowBackIosIcon />
-            </IconButton>
-            <Paper sx={{width: '100%', aspectRatio: '2/2.5'}}>
+            </IconButton> */}
+            <Paper sx={{width: '100%', aspectRatio: '2/2.5', maxWidth: 370}}>
               <Box id="question" sx={{width: '100%', height: '100%'}}>
                 <Box sx={{display: 'flex', justifyContent: 'center', borderBottom: '1px solid #c2c2c2'}}>
                   <Typography sx={{fontWeight: 700, padding: 1.5}}>Question</Typography>
                 </Box>
                 {
                   questions?.map((question, idx) => {
+                    if(question.type == 2) {
+                      console.log("[question]" , typeof question.options, question.options);
+                    }
                     return (
-                      <Box sx={{width: '100%', height: '100%', display: questionIndex === idx ? "block" : 'none', padding: 2}}>
-                        <Typography variant={"h6"} sx={{display: 'flex', justifyContent: 'center', height: '40%'}}>{question.question}</Typography>
+                      <Box sx={{width: 'calc(100% - 32px)', height: 'calc(100% - 32px)', display: questionIndex === idx ? "block" : 'none', padding: 2}}>
+                        <Typography 
+                        variant={"h6"} 
+                          sx={{
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            height: question.type == 1 ? '66%' : ( question.type == 2 ? '45%' : '66%' )
+                          }}
+                        >
+                          {question.question}
+                        </Typography>
                         {
                           question.type == 1 ? (
                             <TextField 
-                              sx={{width: 'calc(100% - 32px)'}} 
+                              sx={{width: '100%'}} 
                               placeholder='Enter Answer here' 
                               label={'Answer'} 
                               value={answers[idx]}
@@ -161,6 +187,68 @@ export default function TestPage(props) {
                         }
                         {
                           question.type == 2 ? (
+                            <Box sx={{ paddingInline: 0, overflow: "hidden" }}>
+                              <FormControl sx={{width: '100%'}}>
+                                <FormLabel id="demo-radio-buttons-group-label">Answer</FormLabel>
+                                <RadioGroup
+                                  aria-labelledby="demo-radio-buttons-group-label"
+                                  name="radio-buttons-group"
+                                  sx={{ display: "flex", flexDirection: "column", width: '100%' }}
+                                  value={answers[idx]}
+                                  onChange={(e) => onAnswer(e, idx)}
+                                >
+                                  {question.options.map((option) => (
+                                    <Tooltip
+                                      key={option.value}
+                                      title={option.label}
+                                      placement="top"
+                                      componentsProps={{
+                                        tooltip: {
+                                          sx: {
+                                            fontSize: "1rem", // Increase tooltip text size
+                                            padding: "8px",
+                                          },
+                                        },
+                                      }}
+                                    >
+                                      <FormControlLabel
+                                        value={option.value}
+                                        sx={{ 
+                                          display: "flex", 
+                                          alignItems: "center", 
+                                          width: '100%',
+                                          "& .MuiFormControlLabel-label": {
+                                            width: "calc( 100% - 42px)", // Set fixed width for the label
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            display: "inline-block",
+                                          },
+                                        }}
+                                        control={<Radio />}
+                                        label={
+                                          <Box
+                                            sx={{
+                                              whiteSpace: "nowrap",
+                                              overflow: "hidden",
+                                              textOverflow: "ellipsis",
+                                              maxWidth: '100%',
+                                              display: "inline-block",
+                                            }}
+                                          >
+                                            {option.label}
+                                          </Box>
+                                        }
+                                      />
+                                    </Tooltip>
+                                  ))}
+                                </RadioGroup>
+                              </FormControl>
+                            </Box>
+                          ) : <></>
+                        }
+                        {
+                          question.type == 3 ? (
                               <Box sx={{paddingInline: 4}}>
                                 <FormControl>
                                   <FormLabel id="demo-radio-buttons-group-label">Answer</FormLabel>
@@ -178,39 +266,15 @@ export default function TestPage(props) {
                               </Box>
                           ) : <></>
                         }
-                        {
-                          question.type == 3 ? (
-                              <Box sx={{paddingInline: 4}}>
-                                <FormControl>
-                                  <FormLabel id="demo-radio-buttons-group-label">Answer</FormLabel>
-                                  <RadioGroup
-                                    aria-labelledby="demo-radio-buttons-group-label"
-                                    name="radio-buttons-group"
-                                    sx={{display: 'flex', flexDirection: 'row'}}
-                                    value={answers[idx]}
-                                    onChange={(e)=>onAnswer(e, idx)}
-                                  >
-                                    {
-                                      question?.options.map((option) => {
-                                        return (
-                                          <FormControlLabel value={option} control={<Radio />} label={option} />
-                                        )
-                                      })
-                                    }
-                                  </RadioGroup>
-                                </FormControl>
-                              </Box>
-                          ) : <></>
-                        }
                       </Box>
                     )
                   })
                 }
               </Box>
             </Paper>
-            <IconButton onClick={handleForward}>
+            {/* <IconButton onClick={handleForward} sx={{visibility: questions.length === questionIndex + 1 ? 'visible' : 'hidden'}}>
               <ArrowForwardIosIcon />
-            </IconButton>
+            </IconButton> */}
           </Box>
         </Box>
       </Box>
