@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useNavigate, useSearchParams  } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
-import { Grid2 as Grid, Input, IconButton, Paper, Select, MenuItem, InputLabel, Radio, Switch } from '@mui/material';
+import { Grid2 as Grid, Input, IconButton, Paper, Select, MenuItem, InputLabel, Radio, Switch, Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 import RadioGroup from "@mui/material/RadioGroup";
@@ -18,6 +18,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import EditIcon from '@mui/icons-material/Edit';
+import FormLabel from '@mui/material/FormLabel';
 import { motion } from "framer-motion";
 import { createCard, getCardInfo } from "../../util/service"
 
@@ -348,7 +349,11 @@ export default function CardPage() {
                                   ))}
                                 </RadioGroup>
                                 <Box mt={2} display="flex" gap={1}>
-                                  <Button variant="contained" onClick={handleAddOption}>
+                                  <Button 
+                                    variant="contained" 
+                                    onClick={handleAddOption} 
+                                    sx={{visibility: options.length >= 4 ? 'hidden' : 'visible'}}
+                                  >
                                     Add
                                   </Button>
                                   <TextField
@@ -356,6 +361,7 @@ export default function CardPage() {
                                     variant="outlined"
                                     placeholder="Add new option"
                                     value={newOption}
+                                    sx={{visibility: options.length >= 4 ? 'hidden' : 'visible'}}
                                     onChange={(e) => setNewOption(e.target.value)}
                                   />
                                 </Box>
@@ -442,8 +448,77 @@ export default function CardPage() {
                         <Typography sx={{fontWeight: 700, padding: 1.5}}>{"Question"}</Typography>
                         <IconButton onClick={()=>onEditCard(card, idx)}><EditIcon/></IconButton>
                       </Box>
-                      <Box sx={{padding: 1.5, width: 'calc(100% - 24px)', height: 'calc(100% - 49px - 24px)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <Typography variant='h6'>{card.question}</Typography>
+                      <Box sx={{padding: 1.5, width: 'calc(100% - 24px)', height: 'calc(100% - 49px - 24px)', display: 'flex', flexDirection: 'column',  alignItems: 'center', justifyContent: 'space-between'}}>
+                        <Box >
+                          <Typography variant='h6' sx={{marginBlock: 3, textAlign: 'center'}}>
+                            {
+                              card.type == 1 ? "Fill in the Blank" : card.type === 2 ? "Multiple Choice" : "True or False"
+                            }
+                          </Typography>
+                          <Typography variant='h6'>{card.question}</Typography>
+                        </Box>
+                        {
+                          card.type === 2 ? (
+                            <Box sx={{ paddingInline: 0, overflow: "hidden", width: 'calc( 100% - 24px )' }}>
+                              <FormControl sx={{width: '100%'}}>
+                                <FormLabel id="demo-radio-buttons-group-label">Options</FormLabel>
+                                <RadioGroup
+                                  aria-labelledby="demo-radio-buttons-group-label"
+                                  name="radio-buttons-group"
+                                  // sx={{ display: "flex", flexDirection: "column", width: '100%' }}
+                                  // value={answers[idx]}
+                                  // onChange={(e) => onAnswer(e, idx)}
+                                >
+                                  {card.options.map((option) => (
+                                    <Tooltip
+                                      key={option.value}
+                                      title={option.label}
+                                      placement="top"
+                                      componentsProps={{
+                                        tooltip: {
+                                          sx: {
+                                            fontSize: "1rem", // Increase tooltip text size
+                                            padding: "8px",
+                                          },
+                                        },
+                                      }}
+                                    >
+                                      <FormControlLabel
+                                        value={option.value}
+                                        sx={{ 
+                                          display: "flex", 
+                                          alignItems: "center", 
+                                          width: '100%',
+                                          "& .MuiFormControlLabel-label": {
+                                            width: "300px", // Set fixed width for the label
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            display: "inline-block",
+                                          },
+                                        }}
+                                        control={<Radio disabled/>}
+                                        label={
+                                          <Box
+                                            sx={{
+                                              whiteSpace: "nowrap",
+                                              overflow: "hidden",
+                                              textOverflow: "ellipsis",
+                                              maxWidth: '100%',
+                                              display: "inline-block",
+                                            }}
+                                          >
+                                            {option.label}
+                                          </Box>
+                                        }
+                                      />
+                                    </Tooltip>
+                                  ))}
+                                </RadioGroup>
+                              </FormControl>
+                            </Box>
+                          ) : <Box/>
+                        }
                       </Box>
                     </Box>
                   </Paper>

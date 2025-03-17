@@ -164,16 +164,16 @@ export default function TestPage(props) {
                     }
                     return (
                       <Box sx={{width: 'calc(100% - 32px)', height: 'calc(100% - 32px)', display: questionIndex === idx ? "block" : 'none', padding: 2}}>
-                        <Typography 
-                        variant={"h6"} 
-                          sx={{
-                            display: 'flex', 
-                            justifyContent: 'center', 
-                            height: question.type == 1 ? '66%' : ( question.type == 2 ? '45%' : '66%' )
-                          }}
+                        <Box
+                          sx={{height: question.type == 1 ? '66%' : ( question.type == 2 ? '40%' : '61%' )}}
                         >
-                          {question.question}
-                        </Typography>
+                          <Typography variant='h6' sx={{marginBlock: 3, textAlign: 'center'}}>
+                            {
+                              question.type == 1 ? "Fill in the Blank" : question.type === 2 ? "Multiple Choice" : "True or False"
+                            }
+                          </Typography>
+                          <Typography variant='h6'>{question.question}</Typography>
+                        </Box>
                         {
                           question.type == 1 ? (
                             <TextField 

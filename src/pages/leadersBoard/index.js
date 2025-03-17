@@ -75,9 +75,21 @@ export default function LeadersBoardPage() {
                                 <Typography variant="h5" >
                                     in
                                 </Typography>
-                                <Typography variant="h4" >
-                                    {item.name}
+                                <Typography 
+                                  variant="h4" 
+                                  noWrap
+                                  sx={{
+                                    width: '90%', // Ensures it takes most of the container width
+                                    textOverflow: 'ellipsis', // Prevents text from overflowing
+                                    whiteSpace: 'nowrap', // Forces text to stay on one line
+                                    overflow: 'hidden', // Hides excess text
+                                    fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem', lg: '1.8rem' }, // Adjusts font size responsively
+                                    textAlign: 'center' // Centers the text
+                                  }}
+                                >
+                                  {item.name}
                                 </Typography>
+
                                 <Typography variant="h3" sx={{fontWeight: 700, color: '#DFC207'}}>
                                     {item.score} / {item.total}
                                 </Typography>

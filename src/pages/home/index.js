@@ -140,27 +140,6 @@ export default function HomePage() {
               )
             })
           }
-          
-          {/* <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2, xl: 2 }}>
-          <Paper sx={{color: 'black', background: '#fff', aspectRatio: "2/2.5", width: '100%', borderRadius: 5}}>
-            </Paper>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2, xl: 2 }}>
-          <Paper sx={{color: 'black', background: '#fff', aspectRatio: "2/2.5", width: '100%', borderRadius: 5}}>
-            </Paper>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2, xl: 2 }}>
-          <Paper sx={{color: 'black', background: '#fff', aspectRatio: "2/2.5", width: '100%', borderRadius: 5}}>
-            </Paper>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2, xl: 2 }}>
-          <Paper sx={{color: 'black', background: '#fff', aspectRatio: "2/2.5", width: '100%', borderRadius: 5}}>
-            </Paper>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2, xl: 2 }}>
-          <Paper sx={{color: 'black', background: '#fff', aspectRatio: "2/2.5", width: '100%', borderRadius: 5}}>
-            </Paper>
-          </Grid> */}
         </Grid>
       </Box>
     </Box>
