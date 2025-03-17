@@ -20,6 +20,7 @@ export default function HomePage() {
   const isXs = useMediaQuery(theme.breakpoints.down('sm')); // Using 'sm' breakpoint
   const [hover, setHover] = useState(null);
   const [cards, setCards] = useState([])
+  const baseURL = window.location.origin;
 
   useEffect(() => {
     const getCardsService = async() => {
@@ -119,8 +120,8 @@ export default function HomePage() {
                             <Popper id={id} open={open} anchorEl={anchorEl} placement='right-start'>
                               <Paper elevation={3} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1}}>
                                 <Typography>Link</Typography>
-                                <TextField value={`https://localhost:3000/test/${card.id}`}/>
-                                <Button variant='contained' onClick={()=>handleCopyLink(`https://localhost:3000/test/${card.id}`)}>Copy Link</Button>
+                                <TextField value={`${baseURL}/test/${card.id}`}/>
+                                <Button variant='contained' onClick={()=>handleCopyLink(`${baseURL}/test/${card.id}`)}>Copy Link</Button>
                               </Paper>
                             </Popper>
                             <Button 
