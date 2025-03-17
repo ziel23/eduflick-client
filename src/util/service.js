@@ -16,6 +16,10 @@ export const createCard = (data) => {
     return HTTP.post('cards', data)
 }
 
+export const deleteCard = (id) => {
+    return HTTP.delete(`cards/${id}`)
+}
+
 export const getCardInfo = (id) => {
     return HTTP.get(`cards/${id}`)
 }

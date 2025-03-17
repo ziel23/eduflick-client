@@ -12,7 +12,7 @@ import AddIcon from '@mui/icons-material/Add';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Popper from '@mui/material/Popper';
-import { getCards } from "../../util/service"
+import { getCards, deleteCard } from "../../util/service"
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -23,13 +23,6 @@ export default function HomePage() {
   const baseURL = window.location.origin;
 
   useEffect(() => {
-    const getCardsService = async() => {
-      const response = await getCards();
-      if(response){
-        console.log("[res]", response)
-        setCards(response.data)
-      }
-    }
     getCardsService()
   }, [])
 
@@ -37,6 +30,14 @@ export default function HomePage() {
 
   console.log('isXs:', isXs); // Log the value to check
   
+  const getCardsService = async() => {
+    const response = await getCards();
+    if(response){
+      console.log("[res]", response)
+      setCards(response.data)
+    }
+  }
+
   const handleClick = (event) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
@@ -51,6 +52,11 @@ export default function HomePage() {
       console.error('Failed to copy: ', err);
     });
   };
+
+  const handleDeleteCard = async (id) => {
+    await deleteCard(id)
+    await getCardsService()
+  }
 
   return (
     <Box sx={{width: '100%', paddingTop: 8 }}>
@@ -105,10 +111,12 @@ export default function HomePage() {
                               gap: 2
                             }}
                           >
-                            <Button variant='contained' sx={{width: '100px', background: '#3D3369'}}
-                              onClick={()=>navigate(`/card?id=${card.id}`)}
+                            <Button 
+                              variant='contained' 
+                              sx={{width: '100px', background: '#DFC207'}}
+                              onClick={()=>navigate(`/test/${card.id}`)}
                             >
-                              Edit
+                              Test
                             </Button>
                             <Button 
                               variant='contained' 
@@ -117,6 +125,16 @@ export default function HomePage() {
                             >
                               Share
                             </Button>
+                            <Button variant='contained' sx={{width: '100px', background: '#3D3369'}}
+                              onClick={()=>navigate(`/card?id=${card.id}`)}
+                            >
+                              Edit
+                            </Button>
+                            <Button variant='contained' sx={{width: '100px', background: '#BC544B'}}
+                              onClick={()=>handleDeleteCard(card.id)}
+                            >
+                              Delete
+                            </Button>
                             <Popper id={id} open={open} anchorEl={anchorEl} placement='right-start'>
                               <Paper elevation={3} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1}}>
                                 <Typography>Link</Typography>
@@ -124,13 +142,6 @@ export default function HomePage() {
                                 <Button variant='contained' onClick={()=>handleCopyLink(`${baseURL}/test/${card.id}`)}>Copy Link</Button>
                               </Paper>
                             </Popper>
-                            <Button 
-                              variant='contained' 
-                              sx={{width: '100px', background: '#DFC207'}}
-                              onClick={()=>navigate(`/test/${card.id}`)}
-                            >
-                              Test
-                            </Button>
                           </Box>
                         </Box>
                       ) : <Typography>{card.name}</Typography>

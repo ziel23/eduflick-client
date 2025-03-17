@@ -9,18 +9,22 @@ import { useNavigate, useSearchParams  } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import { Grid2 as Grid, Input, IconButton, Paper, Select, MenuItem, InputLabel, Radio, Switch, Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-
+import Snackbar from '@mui/material/Snackbar';
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Alert from '@mui/material/Alert';
 import FormControl from "@mui/material/FormControl";
 import SaveIcon from '@mui/icons-material/Save';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete'
 import FormLabel from '@mui/material/FormLabel';
 import { motion } from "framer-motion";
 import { createCard, getCardInfo } from "../../util/service"
+import DeleteModal from '@mui/material/Modal';
+
 
 
 export default function CardPage() {
@@ -63,11 +67,16 @@ export default function CardPage() {
   const [value, setValue] = useState(options[0]?.value || null);
   const [valueToF, setValueToF] = useState(1);
   const [newOption, setNewOption] = useState("");
+  const [delOpen, setDelOpen] = useState(false)
+  const [delIndex, setDelIndex] = useState(null)
+  const [infoModal, setInfoModal] = useState({
+    open: false,
+    message: ""
+  })
 
   useEffect(() => {
     const getCardInfoService = async () => {
       const res = await getCardInfo(id);
-      console.log("[res][getCardInfo]", id, res);
       if(res){
         setName(res.data.flashCardName);
         setCards(res.data.questions)
@@ -78,6 +87,17 @@ export default function CardPage() {
       getCardInfoService()
     }
   }, [])
+
+  
+  const handleClose = () => {
+    setInfoModal({
+      open: false,
+      message: ""
+    })
+    if(!id){
+      navigate("/home")
+    }
+  }
   
   const handleBack = () => {
     if (cardIndex != 0) {
@@ -186,12 +206,34 @@ export default function CardPage() {
    setOptions([])
    setIsFront(true)
    setEditIndex(null)
-   onCancel();
+   onCancel();   
   }
 
+  const onDeleteConfirm = (idx) => {
+    setDelOpen(true)
+    setDelIndex(idx)
+  }
+  
   const onAddCard = () => {
     setScreenType(1);
     setIsFront(false)
+  }
+
+  const onDeleteCard = () => {
+    let tempCards = [...cards]
+    tempCards.splice(delIndex, 1)
+    setCards(tempCards);
+    setCardIndex(0)
+    if(tempCards.length === 0){
+      setScreenType(1)
+    }
+    setDelIndex(null)
+    setDelOpen(false)
+  }
+
+  const onCancelDelCard = () => {
+    setDelOpen(false)
+    setDelIndex(false)
   }
 
   const onEditCard = (card, index) => {
@@ -237,13 +279,28 @@ export default function CardPage() {
     console.log("[sendData]", sendData);
     const res = await createCard(sendData)
     console.log("[res][createCard]", res);
+    setInfoModal({open: true, message: id ? 'Successfully updated the flashcard.' : 'Successfully added the flashcard'})
+    if(!id) {
+      navigate(`/card?${res.data.id}`, { replace: true });
+    }
   }
 
-  console.log("[isFront]", isFront);
-  
 
   return (
     <Box sx={{width: '100%', paddingTop: 4, display: 'flex'}}>
+      <Snackbar
+        open={infoModal.open}
+        autoHideDuration={5000}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {infoModal.message}
+        </Alert>
+      </Snackbar>
       <Grid container spacing={3} sx={{width: '100%'}}>
         <Grid size={6} sx={{width: '100%'}}>
           <Box sx={{width: '100%'}}>
@@ -446,7 +503,10 @@ export default function CardPage() {
                       <Box sx={{display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #c2c2c2'}}>
                         <Box sx={{width: 40}}/>
                         <Typography sx={{fontWeight: 700, padding: 1.5}}>{"Question"}</Typography>
-                        <IconButton onClick={()=>onEditCard(card, idx)}><EditIcon/></IconButton>
+                        <Box>
+                          <IconButton onClick={()=>onEditCard(card, idx)}><EditIcon sx={{color: 'rgb(48, 152, 198)'}}/></IconButton>
+                          <IconButton onClick={()=>onDeleteConfirm(idx)}><DeleteIcon sx={{color: 'red'}}/></IconButton>
+                        </Box>
                       </Box>
                       <Box sx={{padding: 1.5, width: 'calc(100% - 24px)', height: 'calc(100% - 49px - 24px)', display: 'flex', flexDirection: 'column',  alignItems: 'center', justifyContent: 'space-between'}}>
                         <Box >
@@ -553,6 +613,30 @@ export default function CardPage() {
           </Box>
         </Grid>
       </Grid>
+      <DeleteModal
+        open={delOpen}
+        onClose={()=>setDelOpen(false)}
+      >
+        <Box 
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
+            p: 4,
+            borderRadius: 1
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Are you sure to delete this card?
+          </Typography>
+          <Box sx={{display: 'flex', justifyContent: 'space-around', marginTop: 2}}>
+            <Button variant="outlined" onClick={()=>onCancelDelCard}>Cancel</Button>
+            <Button variant="contained" sx={{background: 'red'}} onClick={()=>onDeleteCard()}>Delete</Button>
+          </Box>
+        </Box>
+      </DeleteModal>
     </Box>
   );
 }
