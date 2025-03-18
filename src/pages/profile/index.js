@@ -1,58 +1,77 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, Button, Divider, Box, Typography, TextField, IconButton } from "@mui/material";
 import { PhotoCamera, Edit } from "@mui/icons-material";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 import {jwtDecode} from "jwt-decode";
+import { getUserInfo, updateUserInfo } from "../../util/service";
 
 const ProfileSettings = () => {
-  const [profilePic, setProfilePic] = useState(null);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [conpassword, setConpassword] = useState("");
+  const [infoModal, setInfoModal] = useState({
+    open: false,
+    message: ""
+  })
 
   useEffect(()=>{
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        const myUsername = decodedToken.username
-        const myEmail = decodedToken.email
-        setUsername(myUsername);
-        setEmail(myEmail);
-      } catch (error) {
-        console.error("Invalid token", error);
-      }
-    }
+    
+    getUserInfoService();
   },[])
 
-  const handlePhotoChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePic(reader.result);
-      };
-      reader.readAsDataURL(file);
+  const getUserInfoService = async() => {
+    const res = await getUserInfo()
+    if(res){
+      setUsername(res.data.username)
+      setEmail(res.data.email)
     }
-  };
+  }
 
-  const onSave = () => {
+  const onSave = async () => {
 
-    if(!(password === conpassword) || (password === "" || conpassword === "")){
-      alert("Password mismatch!")
-      return
+    if(conpassword !== "" || conpassword !== ""){
+      if(password !== conpassword) {
+        alert("Passwords do not match")
+        return
+      }
     }
 
     const sendData = {
       email: email,
       username: username,
-      password: password
+      password: password,
     }
     console.log("[sendData]", sendData)
+    const res = await updateUserInfo(sendData);
+    setInfoModal({open: true, message: res.message })
+
   }
+
+  const handleClose = () => {
+    setInfoModal({
+      open: false,
+      message: ""
+    })
+  }
+  
 
   return (
     <Box sx={{width: '100%', paddingTop: 4 }}>
+      <Snackbar
+        open={infoModal.open}
+        autoHideDuration={5000}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {infoModal.message}
+        </Alert>
+      </Snackbar>
       <Box sx={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
         <Typography variant="h4" color="white">Profile</Typography>
       </Box>
@@ -60,34 +79,6 @@ const ProfileSettings = () => {
         <Divider sx={{borderColor: 'white'}}/>
       </Box>
       <Box sx={{ maxWidth: 400, p: 3, m: "auto", mt: 5, textAlign: "center", background: 'white', borderRadius: '25px' }}>
-        <Typography variant="h6">Profile Photo</Typography>
-        <label htmlFor="upload-photo">
-          <input
-            style={{ display: "none" }}
-            id="upload-photo"
-            name="upload-photo"
-            type="file"
-            accept="image/*"
-            onChange={handlePhotoChange}
-          />
-          <IconButton color="primary" component="span">
-            <Avatar
-              src={profilePic}
-              sx={{ width: 80, height: 80, m: 1 }}
-            >
-              {!profilePic && <PhotoCamera />}
-            </Avatar>
-          </IconButton>
-        </label>
-        <br />
-        <Button variant="outlined" component="label" sx={{ m: 1 }}>
-          Change Photo
-          <input hidden accept="image/*" type="file" onChange={handlePhotoChange} />
-        </Button>
-        <Button variant="text" color="error" onClick={() => setProfilePic(null)}>
-          Remove Photo
-        </Button>
-        <br />
         <Typography variant="body1" sx={{ mt: 2 }}>Email</Typography>
         <TextField
           fullWidth
@@ -101,15 +92,9 @@ const ProfileSettings = () => {
           variant="standard"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          // InputProps={{
-          //   endAdornment: (
-          //     <IconButton>
-          //       <Edit fontSize="small" />
-          //     </IconButton>
-          //   ),
-          // }}
         />
         <Typography variant="body1" sx={{ mt: 2 }}>Password</Typography>
+        <Typography sx={{fontSize: 11}}>Leave as blank if you dont need to change paswword</Typography>
         <TextField
           fullWidth
           variant="standard"

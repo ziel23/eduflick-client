@@ -40,7 +40,6 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("token"); // Clear token if unauthorized
       window.location.href = "/"; // Redirect to login page
-      alert("sayup bogo")
       return Promise.reject({ message: "Unauthorized" });
     }
 

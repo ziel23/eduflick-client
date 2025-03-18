@@ -39,3 +39,11 @@ export const postAddLeaderBoard = (sendData) => {
 export const getLeadersBoardByFlashcard = (id) => {
     return HTTP.get(`cards/leaders/${id}`)
 }
+
+export const getUserInfo = () => {
+    return HTTP.get('auth/userInfo')
+}
+
+export const updateUserInfo = (sendData) => {
+    return HTTP.post('auth/userInfo', sendData)
+}
