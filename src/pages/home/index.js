@@ -12,6 +12,7 @@ import AddIcon from '@mui/icons-material/Add';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Popper from '@mui/material/Popper';
+import DeleteModal from '@mui/material/Modal';
 import { getCards, deleteCard } from "../../util/service"
 
 export default function HomePage() {
@@ -20,6 +21,8 @@ export default function HomePage() {
   const isXs = useMediaQuery(theme.breakpoints.down('sm')); // Using 'sm' breakpoint
   const [hover, setHover] = useState(null);
   const [cards, setCards] = useState([])
+  const [delOpen, setDelOpen] = useState(false)
+  const [delIndex, setDelIndex] = useState(null)
   const baseURL = window.location.origin;
 
   useEffect(() => {
@@ -53,11 +56,25 @@ export default function HomePage() {
     });
   };
 
-  const handleDeleteCard = async (id) => {
-    await deleteCard(id)
-    await getCardsService()
+  const onDeleteConfirm = (idx) => {
+    setDelOpen(true)
+    setDelIndex(idx)
   }
 
+  const onDeleteFlashCard = async() => {
+    await deleteCard(delIndex)
+    await getCardsService()
+    setDelIndex(null)
+    setDelOpen(false)
+  }
+
+  const onCancelDelFlashCard = () => {
+    setDelOpen(false)
+    setDelIndex(null)
+  }
+
+  
+  
   return (
     <Box sx={{width: '100%', paddingTop: 8 }}>
       <Box sx={{display: 'flex', width: '100%', justifyContent: 'space-between'}}>
@@ -131,7 +148,7 @@ export default function HomePage() {
                               Edit
                             </Button>
                             <Button variant='contained' sx={{width: '100px', background: '#BC544B'}}
-                              onClick={()=>handleDeleteCard(card.id)}
+                              onClick={()=>onDeleteConfirm(card.id)}
                             >
                               Delete
                             </Button>
@@ -154,6 +171,32 @@ export default function HomePage() {
           }
         </Grid>
       </Box>
+      <DeleteModal
+        open={delOpen}
+        onClose={()=>setDelOpen(false)}
+      >
+        <Box 
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
+            p: 4,
+            borderRadius: 1,
+            width: 'calc(100% - 24px)',
+            maxWidth: '300px'
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Are you sure to delete this card?
+          </Typography>
+          <Box sx={{display: 'flex', justifyContent: 'space-around', marginTop: 2}}>
+            <Button variant="outlined" onClick={onCancelDelFlashCard}>Cancel</Button>
+            <Button variant="contained" sx={{background: 'red'}} onClick={()=>onDeleteFlashCard()}>Delete</Button>
+          </Box>
+        </Box>
+      </DeleteModal>
     </Box>
   );
 }

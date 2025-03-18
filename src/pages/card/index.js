@@ -233,13 +233,11 @@ export default function CardPage() {
 
   const onCancelDelCard = () => {
     setDelOpen(false)
-    setDelIndex(false)
+    setDelIndex(null)
   }
 
   const onEditCard = (card, index) => {
     setScreenType(1);
-    console.log("[card]", card);
-    
     setEditIndex(index)
     setQuestion(card.question);
     setAnswerType(card.type);
@@ -281,7 +279,7 @@ export default function CardPage() {
     console.log("[res][createCard]", res);
     setInfoModal({open: true, message: id ? 'Successfully updated the flashcard.' : 'Successfully added the flashcard'})
     if(!id) {
-      navigate(`/card?${res.data.id}`, { replace: true });
+      navigate(`/card?id=${res.data.id}`, { replace: true });
     }
   }
 
@@ -625,14 +623,16 @@ export default function CardPage() {
             transform: 'translate(-50%, -50%)',
             bgcolor: 'background.paper',
             p: 4,
-            borderRadius: 1
+            borderRadius: 1,
+            width: 'calc(100% - 24px)',
+            maxWidth: '300px'
           }}
         >
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Are you sure to delete this card?
           </Typography>
           <Box sx={{display: 'flex', justifyContent: 'space-around', marginTop: 2}}>
-            <Button variant="outlined" onClick={()=>onCancelDelCard}>Cancel</Button>
+            <Button variant="outlined" onClick={onCancelDelCard}>Cancel</Button>
             <Button variant="contained" sx={{background: 'red'}} onClick={()=>onDeleteCard()}>Delete</Button>
           </Box>
         </Box>

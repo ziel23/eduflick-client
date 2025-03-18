@@ -1,11 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, Button, Divider, Box, Typography, TextField, IconButton } from "@mui/material";
 import { PhotoCamera, Edit } from "@mui/icons-material";
+import {jwtDecode} from "jwt-decode";
 
 const ProfileSettings = () => {
   const [profilePic, setProfilePic] = useState(null);
-  const [username, setUsername] = useState("Example Username");
-  const [email, setEmail] = useState("example@email.com");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [conpassword, setConpassword] = useState("");
+
+  useEffect(()=>{
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const myUsername = decodedToken.username
+        const myEmail = decodedToken.email
+        setUsername(myUsername);
+        setEmail(myEmail);
+      } catch (error) {
+        console.error("Invalid token", error);
+      }
+    }
+  },[])
 
   const handlePhotoChange = (event) => {
     const file = event.target.files[0];
@@ -17,6 +35,21 @@ const ProfileSettings = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  const onSave = () => {
+
+    if(!(password === conpassword) || (password === "" || conpassword === "")){
+      alert("Password mismatch!")
+      return
+    }
+
+    const sendData = {
+      email: email,
+      username: username,
+      password: password
+    }
+    console.log("[sendData]", sendData)
+  }
 
   return (
     <Box sx={{width: '100%', paddingTop: 4 }}>
@@ -55,20 +88,6 @@ const ProfileSettings = () => {
           Remove Photo
         </Button>
         <br />
-        <Typography variant="body1" sx={{ mt: 2 }}>Username</Typography>
-        <TextField
-          fullWidth
-          variant="standard"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <IconButton>
-                <Edit fontSize="small" />
-              </IconButton>
-            ),
-          }}
-        />
         <Typography variant="body1" sx={{ mt: 2 }}>Email</Typography>
         <TextField
           fullWidth
@@ -76,7 +95,37 @@ const ProfileSettings = () => {
           value={email}
           disabled
         />
-        <Button variant="contained" sx={{ mt: 3, color: 'white' }}>
+        <Typography variant="body1" sx={{ mt: 2 }}>Username</Typography>
+        <TextField
+          fullWidth
+          variant="standard"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          // InputProps={{
+          //   endAdornment: (
+          //     <IconButton>
+          //       <Edit fontSize="small" />
+          //     </IconButton>
+          //   ),
+          // }}
+        />
+        <Typography variant="body1" sx={{ mt: 2 }}>Password</Typography>
+        <TextField
+          fullWidth
+          variant="standard"
+          type="password"
+          value={password}
+          onChange={(e)=>setPassword(e.target.value)}
+        />
+        <Typography variant="body1" sx={{ mt: 2 }}>Confirm Password</Typography>
+        <TextField
+          fullWidth
+          variant="standard"
+          type="password"
+          value={conpassword}
+          onChange={(e)=>setConpassword(e.target.value)}
+        />
+        <Button variant="contained" sx={{ mt: 3, color: 'white' }} onClick={onSave}>
           Save
         </Button>
       </Box>
