@@ -28,23 +28,20 @@ export default function SignUpPage() {
     try {
       e.preventDefault();
       if(formData.password === formData.conpassword){
-        try {
-          e.preventDefault();
-          const response = await signup(formData)
-          
-          if(response.status != "201"){
-            setInfoModal({open: true, message: response.message})
+        await signup(formData).then(res => {
+          if(res.status != "201"){
+            setInfoModal({open: true, message: res.message})
           } else{
             navigate('/home')
-            localStorage.setItem("token", response.token);
+            localStorage.setItem("token", res.token);
           }
-        } catch (error) {
-          console.error("[LOGIN][ERROR]",error)
+        }).catch((err) => {
+          console.error("[LOGIN][ERROR]",err)
           setInfoModal({
             open: true,
-            message: error
+            message: err
           })
-        }
+        })
       }else {
         setInfoModal({open: true, message: "Passwords do not match"})
       }
