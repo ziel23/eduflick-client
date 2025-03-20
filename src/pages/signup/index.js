@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { signup } from '../../util/service';
-import { Grid2 } from '@mui/material';
+import { Alert, Grid2 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 
 
@@ -27,7 +27,7 @@ export default function SignUpPage() {
   const handleSignUp = async(e) => {
     try {
       e.preventDefault();
-      if(formData.password == formData.conpassword){
+      if(formData.password === formData.conpassword){
         try {
           e.preventDefault();
           const response = await signup(formData)
@@ -45,6 +45,8 @@ export default function SignUpPage() {
             message: error
           })
         }
+      }else {
+        setInfoModal({open: true, message: "Passwords do not match"})
       }
     } catch (error) {
       console.error("[LOGIN][ERROR]",error)
@@ -70,9 +72,16 @@ export default function SignUpPage() {
     <Box sx={{ width: '100%' }}>
       <Snackbar
         open={infoModal.open}
-        onClose={handleClose}
-        message={infoModal.message}
-      />
+        autoHideDuration={5000}
+      >
+        <Alert
+          severity="error"
+          onClose={handleClose}
+          variant="filled"
+        >
+          {infoModal.message}
+        </Alert>
+      </Snackbar>
       <Grid2 container sx={{width: '100%'}}>
         <Grid2 size={{xl: 7, lg: 7, md: 6, sm: 12, xs: 12}} >
 

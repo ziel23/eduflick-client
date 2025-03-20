@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../util/service';
 import Snackbar from '@mui/material/Snackbar';
-import { Grid2, Paper } from '@mui/material';
+import { Alert, Grid2, Paper } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
@@ -65,9 +65,16 @@ export default function LoginPage() {
     <Box sx={{ width: '100%' }}>
       <Snackbar
         open={infoModal.open}
-        onClose={handleClose}
-        message={infoModal.message}
-      />
+        autoHideDuration={5000}
+      >
+        <Alert
+          severity="error"
+          onClose={handleClose}
+          variant="filled"
+        >
+          {infoModal.message}
+        </Alert>
+      </Snackbar>
       <Grid2 container sx={{width: '100%'}}>
         <Grid2 size={{xl: 7, lg: 7, md: 6, sm: 12, xs: 12}} >
 
