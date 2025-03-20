@@ -32,7 +32,7 @@ export default function SignUpPage() {
           e.preventDefault();
           const response = await signup(formData)
           
-          if(response.status != "200"){
+          if(response.status != "201"){
             setInfoModal({open: true, message: response.message})
           } else{
             navigate('/home')
