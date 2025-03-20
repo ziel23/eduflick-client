@@ -14,6 +14,7 @@ import { useTheme } from '@mui/material/styles';
 import Popper from '@mui/material/Popper';
 import DeleteModal from '@mui/material/Modal';
 import { getCards, deleteCard } from "../../util/service"
+import {jwtDecode} from "jwt-decode";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -23,9 +24,21 @@ export default function HomePage() {
   const [cards, setCards] = useState([])
   const [delOpen, setDelOpen] = useState(false)
   const [delIndex, setDelIndex] = useState(null)
+  const [myUserId, setMyUserId] = useState(null)
   const baseURL = window.location.origin;
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    console.log("[token]", token);
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const id = decodedToken.id
+        setMyUserId(id)
+      } catch (error) {
+        console.error("Invalid token", error);
+      }
+    }
     getCardsService()
   }, [])
 
@@ -142,16 +155,21 @@ export default function HomePage() {
                             >
                               Share
                             </Button>
-                            <Button variant='contained' sx={{width: '100px', background: '#3D3369'}}
-                              onClick={()=>navigate(`/card?id=${card.id}`)}
-                            >
-                              Edit
-                            </Button>
-                            <Button variant='contained' sx={{width: '100px', background: '#BC544B'}}
-                              onClick={()=>onDeleteConfirm(card.id)}
-                            >
-                              Delete
-                            </Button>
+                            
+                            {
+                              card.user_id == myUserId && <>
+                              <Button variant='contained' sx={{width: '100px', background: '#3D3369'}}
+                                onClick={()=>navigate(`/card?id=${card.id}`)}
+                              >
+                                Edit
+                              </Button>
+                              <Button variant='contained' sx={{width: '100px', background: '#BC544B'}}
+                                onClick={()=>onDeleteConfirm(card.id)}
+                              >
+                                Delete
+                              </Button></>
+                            }
+                            
                             <Popper id={id} open={open} anchorEl={anchorEl} placement='right-start'>
                               <Paper elevation={3} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1}}>
                                 <Typography>Link</Typography>

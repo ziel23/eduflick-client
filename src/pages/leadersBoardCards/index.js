@@ -43,8 +43,6 @@ export default function LeadersBoardPage() {
           try {
             const decodedToken = jwtDecode(token);
             const myUsername = decodedToken.username
-            console.log("[res]", res.data);
-            
             const rank = res.data.findIndex(item => item.username === myUsername);
             if(rank != -1) {
               setMyRank(rank+1)
