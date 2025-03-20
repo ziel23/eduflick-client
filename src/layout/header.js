@@ -31,6 +31,7 @@ export default function Header() {
 
   const handleLogout = () => {
     navigate('/')
+    localStorage.removeItem('token')
     handleClose()
   }
 
